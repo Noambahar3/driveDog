@@ -1,0 +1,11 @@
+{
+  "id": "proj-20260722-c0bjt68np0t",
+  "name": "Drive Dog",
+  "slackChannelId": "C0BJT68NP0T",
+  "createdAt": "2026-07-22T08:00:00Z",
+  "separateFrom": [
+    "Solar Tzadi",
+    "TG Energy"
+  ],
+  "notes": "Keep this project isolated unless Noam explicitly asks to connect it to another system."
+}
