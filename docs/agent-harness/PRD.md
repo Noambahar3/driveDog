@@ -15,6 +15,9 @@ and delivery planning are scattered, creating operational disorder.
 Build an MVP CRM and ordering system that centralizes customers, products,
 orders, payments, invoices, and delivery planning in one place.
 
+Drive Dog is not a public ecommerce store. It is a closed ordering system for
+customers approved and created by the business owner.
+
 ## Target Users
 
 ### Business Owner
@@ -56,7 +59,14 @@ the catalog, reorder past products, create an order, and choose payment.
 - Temporary code login.
 - Customer sees only their own data.
 - No open self-registration.
+- No public signup.
+- No anonymous checkout.
+- No public storefront behavior where anyone can browse and buy.
 - Generic response for unknown phone numbers.
+
+Access rule:
+
+- Only customers created or approved by the business owner may place orders.
 
 ### Catalog
 
@@ -131,4 +141,3 @@ payment status.
 - Cash-on-delivery invoice behavior.
 - Whether initial customer import from CSV/Excel is required.
 - Whether service areas need predefined zones or free-text city/area values.
-

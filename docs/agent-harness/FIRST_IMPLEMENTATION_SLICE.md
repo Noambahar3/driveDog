@@ -15,6 +15,9 @@ Owner manages customers/products -> owner creates a manual order -> system
 calculates totals -> order appears in delivery/payment views -> payment provider
 is represented by stubs.
 
+Product boundary: Drive Dog must stay a closed owner-approved customer system,
+not a public ecommerce store.
+
 ## PRD / SPEC Readiness Assessment
 
 `PRD.md` and `SPEC.md` are clear enough for a first implementation slice if the
@@ -67,6 +70,9 @@ Assessment:
 - Medusa/Vendure/Saleor are strong for larger commerce platforms, but they bring
   substantial commerce assumptions, setup, and integration surface for a small
   closed CRM with about 100 customers and 30-40 products.
+- Drive Dog explicitly should not be modeled as an open storefront. Any future
+  customer-facing catalog must sit behind phone-code access for customers
+  approved by the business owner.
 - Drive Dog's first slice needs custom CRM behavior, manual orders, local
   pricing rules, simple delivery views, and Grow-specific payment stubs more
   than a full commerce engine.
@@ -80,6 +86,8 @@ Recommendation:
 - Re-evaluate admin framework use after the first domain model is implemented.
 - Do not adopt a full headless commerce platform for slice 1 unless Noam
   explicitly wants the project to become a commerce-platform customization.
+- Do not implement anonymous catalog browsing, public checkout, or public signup
+  in any first scaffold.
 
 ## First MVP Slice
 
@@ -113,6 +121,9 @@ Do not build these in slice 1:
 
 - Customer portal.
 - Phone-code OTP login.
+- Public storefront.
+- Public signup.
+- Anonymous checkout.
 - Live Grow / Meshulam payment API calls.
 - Real webhook handling.
 - Real invoice callback handling.
@@ -427,4 +438,3 @@ Do not run until Noam approves scaffold start.
 ```bash
 git checkout -b dev
 ```
-

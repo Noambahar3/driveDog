@@ -60,3 +60,11 @@ changes. Keep entries short and factual.
 - Existing-solutions preflight checked Medusa, Vendure, Saleor, and Refine.
 - Recommendation: start custom small scaffold on `dev` after Noam approves slice
   assumptions.
+
+### Product Boundary Confirmed
+
+- Noam clarified that Drive Dog must not be a public store.
+- The system is only for customers selected/created/approved by the business
+  owner.
+- Public signup, anonymous checkout, and open storefront behavior are outside
+  the intended product direction.

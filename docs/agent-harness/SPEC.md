@@ -9,6 +9,10 @@ Drive Dog is a closed CRM and ordering system for recurring private customers.
 The business owner creates customers. Customers then use phone-code login to
 order food products from a structured catalog.
 
+This system must not behave like an open public store. There is no anonymous
+checkout, no open registration, and no order placement for customers that the
+business owner has not created or approved.
+
 ## Roles
 
 ### `owner`
@@ -161,6 +165,10 @@ Allowed `source` values:
 - Max attempts: TBD, recommended 5 attempts before temporary lock.
 - Unknown phone numbers should receive a generic response.
 - Customers cannot create accounts by themselves.
+- Customers cannot browse/place orders unless their phone number belongs to an
+  active owner-created customer record.
+- Unknown users may receive a contact message, but not a self-service signup
+  flow.
 
 ## Order Rules
 
@@ -236,4 +244,3 @@ Signature behavior:
 - Email/signature backend provider: TBD
 - Grow / Meshulam credentials: TBD
 - Initial customer import method: TBD
-
