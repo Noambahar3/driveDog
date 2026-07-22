@@ -640,20 +640,8 @@
             <li>מזומן לשליח הוא חריג, לא ברירת מחדל.</li>
             <li>המערכת צריכה לעבוד טוב גם במובייל וגם במחשב.</li>
             <li>משלוחים מנוהלים ידנית לפי תאריך ואזור.</li>
+            <li>תחזוקה חודשית לאחר העלייה לאוויר: 300 ₪ + מע״מ לחודש.</li>
           </ul>
-        </article>
-        <article class="panel">
-          <div class="section-head">
-            <span>07</span>
-            <h2>פרטים מסחריים להשלמה</h2>
-          </div>
-          <div class="placeholder">
-            <div class="placeholder-row"><strong>מחיר פרויקט</strong><div class="blank"></div></div>
-            <div class="placeholder-row"><strong>לוחות זמנים</strong><div class="blank"></div></div>
-            <div class="placeholder-row"><strong>תנאי תשלום</strong><div class="blank"></div></div>
-            <div class="placeholder-row"><strong>תחזוקה חודשית</strong><div>300 ₪ + מע״מ לחודש לאחר העלייה לאוויר</div></div>
-            <div class="placeholder-row"><strong>סבבי תיקונים</strong><div class="blank"></div></div>
-          </div>
         </article>
       </div>
     </section>
@@ -661,9 +649,9 @@
     <section>
       <div class="wrap">
         <div class="section-head">
-          <span>08</span>
+          <span>07</span>
           <h2>אישור וחתימה דיגיטלית</h2>
-          <p>לאישור ההצעה, ניתן למלא פרטים ולחתום בתיבה. בעמוד הסטטי הזה אפשר להוריד אישור חתום או להדפיס ל-PDF.</p>
+          <p>לאישור ההצעה, ניתן למלא פרטים ולחתום בתיבה. בלחיצה על אישור נוצר קובץ אישור חתום ונפתח מייל מוכן לשליחה ל-Orma AI.</p>
         </div>
         <div class="panel">
           <div class="signature-grid">
@@ -693,11 +681,11 @@
                 <span>אני מאשר את ההצעה, תכולת ה-MVP, תנאי העבודה והעלות החודשית של 300 ₪ + מע״מ כמפורט במסמך זה.</span>
               </label>
               <div class="buttons">
-                <button class="primary" type="button" id="downloadApproval">הורדת אישור חתום</button>
+                <button class="primary" type="button" id="downloadApproval">אישור ושליחת חתימה</button>
                 <button class="secondary" type="button" id="clearSignature">ניקוי חתימה</button>
                 <button class="secondary" type="button" id="printProposal">הדפסה / PDF</button>
               </div>
-              <div class="notice" id="signatureNotice">נוצר קובץ אישור חתום להורדה.</div>
+              <div class="notice" id="signatureNotice">נוצר קובץ אישור חתום ונפתח מייל ל־Ami@hai.tech. יש לצרף את הקובץ למייל ולשלוח.</div>
             </div>
           </div>
         </div>
@@ -762,10 +750,19 @@
       return document.getElementById(id).value.trim();
     }
 
+    function signatureIsBlank() {
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] !== 0) return false;
+      }
+      return true;
+    }
+
     function downloadSignedApproval() {
       const approved = document.getElementById('signApproval').checked;
-      if (!approved) {
-        alert('יש לסמן אישור להצעה לפני הורדת האישור החתום.');
+      const name = fieldValue('signName');
+      if (!approved || !name || signatureIsBlank()) {
+        alert('צריך למלא שם, לסמן אישור ולחתום לפני שליחה.');
         return;
       }
 
@@ -782,6 +779,24 @@
       link.remove();
       URL.revokeObjectURL(url);
       document.getElementById('signatureNotice').style.display = 'block';
+
+      const subject = encodeURIComponent('אישור הצעת MVP - דרייב דוג');
+      const body = encodeURIComponent([
+        'שלום,',
+        '',
+        'מצורף אישור חתום להצעת MVP - דרייב דוג.',
+        '',
+        `שם: ${fieldValue('signName')}`,
+        `טלפון: ${fieldValue('signPhone')}`,
+        `אימייל: ${fieldValue('signEmail')}`,
+        `תאריך אישור: ${date}`,
+        '',
+        'הערות:',
+        fieldValue('signNotes') || '-',
+        '',
+        'יש לצרף למייל את קובץ האישור החתום שירד למחשב/טלפון.'
+      ].join('\n'));
+      window.location.href = `mailto:Ami@hai.tech?subject=${subject}&body=${body}`;
     }
 
     window.addEventListener('resize', resizeCanvas);
