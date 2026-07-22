@@ -44,6 +44,8 @@ from any other project into Drive Dog.
 - `HANDOFF.md` - packet format for transferring tasks to implementation.
 - `CLIENT_DISCOVERY_CHECKLIST.md` - focused questions still needed from Noam,
   the business owner, Grow, or implementation stakeholders.
+- `FIRST_IMPLEMENTATION_SLICE.md` - owner-side first MVP slice definition,
+  scaffold readiness, stubs, acceptance criteria, and branch recommendation.
 
 ## Default Work Loop
 
@@ -77,4 +79,3 @@ from any other project into Drive Dog.
 3. Turn the MVP into screen-level flows.
 4. Define the first implementation slice.
 5. Prepare a clean handoff packet when development starts.
-
