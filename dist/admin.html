@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drive Dog | ניהול</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f5;
+      --panel: #ffffff;
+      --panel-2: #f9faf9;
+      --ink: #17211d;
+      --muted: #66736d;
+      --line: #dce3df;
+      --brand: #27745c;
+      --brand-dark: #1f5f4b;
+      --warn: #a15c09;
+      --danger: #b42318;
+      --ok: #197a45;
+      --shadow: 0 12px 30px rgba(33, 43, 38, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px;
+      background: #17211d;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #d9f2e8;
+      color: #17211d;
+      font-weight: 900;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-button {
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      text-align: right;
+      color: rgba(255, 255, 255, 0.78);
+      background: transparent;
+    }
+
+    .nav-button.active,
+    .nav-button:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .side-note {
+      margin-top: auto;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 13px;
+    }
+
+    main {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 5px;
+      font-size: 25px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 38px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: #e5ece8;
+      color: var(--ink);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      background: var(--brand);
+      color: #ffffff;
+    }
+
+    .button.primary:hover { background: var(--brand-dark); }
+    .button.danger { color: #ffffff; background: var(--danger); }
+    .button.ghost { background: transparent; border: 1px solid var(--line); }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 14px;
+    }
+
+    .metric,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric {
+      padding: 15px;
+      min-height: 96px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+    }
+
+    .panel {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #ccd7d1;
+      border-radius: 7px;
+      padding: 9px 10px;
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      background: var(--panel-2);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mini {
+      min-height: 30px;
+      padding: 6px 9px;
+      border-radius: 6px;
+      background: #edf2ef;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #edf2ef;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.ok { background: #e3f4ea; color: var(--ok); }
+    .status.warn { background: #fff3df; color: var(--warn); }
+    .status.danger { background: #fde8e6; color: var(--danger); }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .order-builder {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 82px 42px;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .delivery-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .delivery-card.cash {
+      border-color: #efc06b;
+      background: #fffaf0;
+    }
+
+    .muted { color: var(--muted); }
+    .nowrap { white-space: nowrap; }
+    .hidden { display: none !important; }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--panel-2);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      max-width: min(420px, calc(100% - 36px));
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #17211d;
+      color: #ffffff;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+      nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .side-note { display: none; }
+      .split,
+      .metrics,
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        display: grid;
+      }
+      .toolbar {
+        justify-content: stretch;
+      }
+      .toolbar .button {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 620px) {
+      main { padding: 14px; }
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .form-grid,
+      .item-row {
+        grid-template-columns: 1fr;
+      }
+      .item-row .mini {
+        min-height: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="mark">DD</span><span>Drive Dog</span></div>
+      <nav id="nav"></nav>
+      <div class="side-note">MVP פנימי: הדאטה נשמר בדפדפן בלבד. Grow / משולם מסומן כ-stub ולא מחייב בפועל.</div>
+    </aside>
+    <main>
+      <div class="topbar">
+        <div>
+          <h1 id="pageTitle">דשבורד</h1>
+          <p id="pageSubtitle" class="subtitle">תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.</p>
+        </div>
+        <div class="toolbar">
+          <button class="button ghost" id="exportBtn" type="button">ייצוא JSON</button>
+          <button class="button ghost" id="resetBtn" type="button">איפוס דמו</button>
+        </div>
+      </div>
+      <section id="view"></section>
+    </main>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'driveDogAdminMvpV1';
+    const tabs = [
+      ['dashboard', 'דשבורד', 'תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.'],
+      ['customers', 'לקוחות', 'ניהול לקוחות קיימים בלבד. אין הרשמה פתוחה.'],
+      ['products', 'מוצרים', 'קטלוג בסיסי של משפחות ווריאנטים.'],
+      ['pricing', 'מחירים', 'מחיר אישי או הנחה לפי לקוח ומוצר.'],
+      ['orders', 'הזמנות', 'יצירת הזמנה ידנית וניהול סטטוס תשלום.'],
+      ['deliveries', 'משלוחים', 'רשימת אספקות לפי תאריך ואזור.'],
+      ['settings', 'הגדרות', 'תלויות חיצוניות שמסומנות כ-stub.']
+    ];
+
+    const seed = {
+      customers: [
+        { id: 'c1', name: 'עמי כהן', phone: '050-1111111', address: 'הכלנית 12', city: 'ראשון לציון', area: 'מרכז', deliveryNotes: 'להתקשר לפני הגעה', internalNotes: 'מעדיף שק 12 ק"ג', active: true },
+        { id: 'c2', name: 'דנה לוי', phone: '052-2222222', address: 'הגפן 8', city: 'רחובות', area: 'שפלה', deliveryNotes: 'להשאיר ליד הדלת', internalNotes: 'משלמת אונליין', active: true },
+        { id: 'c3', name: 'יוסי מזרחי', phone: '054-3333333', address: 'העצמאות 40', city: 'אשדוד', area: 'דרום', deliveryNotes: 'כלב גדול בחצר', internalNotes: 'מזומן לשליח', active: true }
+      ],
+      products: [
+        { id: 'p1', brand: 'Brit', series: 'Care', animal: 'כלב', stage: 'בוגר', flavor: 'כבש ואורז', weightKg: 12, name: 'Brit Care כבש ואורז 12 ק"ג', basePrice: 279, active: true },
+        { id: 'p2', brand: 'Monge', series: 'Natural', animal: 'כלב', stage: 'גור', flavor: 'עוף', weightKg: 12, name: 'Monge גור עוף 12 ק"ג', basePrice: 295, active: true },
+        { id: 'p3', brand: 'Acana', series: 'Classic', animal: 'כלב', stage: 'בוגר', flavor: 'עוף', weightKg: 11.4, name: 'Acana Classic עוף 11.4 ק"ג', basePrice: 349, active: true },
+        { id: 'p4', brand: 'Royal Canin', series: 'Indoor', animal: 'חתול', stage: 'בוגר', flavor: 'עוף', weightKg: 4, name: 'Royal Canin Indoor חתול 4 ק"ג', basePrice: 189, active: true },
+        { id: 'p5', brand: 'Josera', series: 'SensiCat', animal: 'חתול', stage: 'בוגר', flavor: 'עוף', weightKg: 10, name: 'Josera SensiCat 10 ק"ג', basePrice: 265, active: true }
+      ],
+      prices: [
+        { id: 'cp1', customerId: 'c1', productId: 'p1', customPrice: 259, discountPercent: 0, notes: 'מחיר קבוע' },
+        { id: 'cp2', customerId: 'c2', productId: 'p4', customPrice: 0, discountPercent: 8, notes: 'הנחת לקוחה קבועה' }
+      ],
+      orders: [
+        { id: 'o1001', customerId: 'c1', createdAt: '2026-07-22', deliveryDate: '2026-07-25', status: 'new', paymentStatus: 'pending_online_payment', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1001', notes: 'לשלוח קישור תשלום', items: [{ productId: 'p1', quantity: 1, unitPrice: 259 }] },
+        { id: 'o1002', customerId: 'c2', createdAt: '2026-07-21', deliveryDate: '2026-07-24', status: 'confirmed', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1002', notes: '', items: [{ productId: 'p4', quantity: 2, unitPrice: 174 }] },
+        { id: 'o1003', customerId: 'c3', createdAt: '2026-07-20', deliveryDate: '2026-07-26', status: 'confirmed', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'מזומן לשליח', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] }
+      ],
+      selected: { customerId: 'c1', productId: 'p1' }
+    };
+
+    let state = loadState();
+    let currentTab = 'dashboard';
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return clone(seed);
+      try {
+        return { ...clone(seed), ...JSON.parse(raw) };
+      } catch {
+        return clone(seed);
+      }
+    }
+
+    function saveState(message) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (message) toast(message);
+      render();
+    }
+
+    function shekel(value) {
+      return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(value || 0);
+    }
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function nextId(prefix, list) {
+      return prefix + (Date.now().toString(36) + list.length.toString(36));
+    }
+
+    function customer(id) {
+      return state.customers.find((item) => item.id === id);
+    }
+
+    function product(id) {
+      return state.products.find((item) => item.id === id);
+    }
+
+    function orderTotal(order) {
+      return order.items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unitPrice || 0), 0);
+    }
+
+    function priceFor(customerId, productId) {
+      const base = product(productId)?.basePrice || 0;
+      const override = state.prices.find((item) => item.customerId === customerId && item.productId === productId);
+      if (!override) return base;
+      const custom = Number(override.customPrice || 0);
+      const start = custom > 0 ? custom : base;
+      return Math.round(start * (1 - Number(override.discountPercent || 0) / 100));
+    }
+
+    function statusLabel(value) {
+      const labels = {
+        new: 'חדשה',
+        confirmed: 'מאושרת',
+        delivered: 'סופקה',
+        cancelled: 'בוטלה',
+        pending_online_payment: 'ממתין לתשלום',
+        cash_on_delivery: 'מזומן לשליח',
+        paid_cash: 'שולם במזומן',
+        paid_online: 'שולם אונליין',
+        failed: 'נכשל'
+      };
+      return labels[value] || value;
+    }
+
+    function statusClass(value) {
+      if (['paid_online', 'paid_cash', 'delivered', 'confirmed'].includes(value)) return 'ok';
+      if (['cash_on_delivery', 'pending_online_payment', 'new'].includes(value)) return 'warn';
+      if (['failed', 'cancelled'].includes(value)) return 'danger';
+      return '';
+    }
+
+    function toast(message) {
+      const node = document.getElementById('toast');
+      node.textContent = message;
+      node.classList.remove('hidden');
+      window.clearTimeout(toast.timer);
+      toast.timer = window.setTimeout(() => node.classList.add('hidden'), 2400);
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('nav');
+      nav.innerHTML = tabs.map(([id, label]) => `<button class="nav-button ${id === currentTab ? 'active' : ''}" data-tab="${id}" type="button">${label}</button>`).join('');
+      nav.querySelectorAll('button').forEach((button) => {
+        button.addEventListener('click', () => {
+          currentTab = button.dataset.tab;
+          render();
+        });
+      });
+    }
+
+    function render() {
+      renderNav();
+      const [, title, subtitle] = tabs.find(([id]) => id === currentTab);
+      document.getElementById('pageTitle').textContent = title;
+      document.getElementById('pageSubtitle').textContent = subtitle;
+      const view = document.getElementById('view');
+      view.innerHTML = ({
+        dashboard: dashboardView,
+        customers: customersView,
+        products: productsView,
+        pricing: pricingView,
+        orders: ordersView,
+        deliveries: deliveriesView,
+        settings: settingsView
+      })[currentTab]();
+      bindView();
+    }
+
+    function dashboardView() {
+      const openOrders = state.orders.filter((order) => order.status !== 'delivered' && order.status !== 'cancelled');
+      const cash = state.orders.filter((order) => order.paymentStatus === 'cash_on_delivery');
+      const revenue = state.orders.filter((order) => ['paid_online', 'paid_cash'].includes(order.paymentStatus)).reduce((sum, order) => sum + orderTotal(order), 0);
+      return `
+        <div class="grid metrics">
+          <div class="metric"><span>לקוחות פעילים</span><strong>${state.customers.filter((item) => item.active).length}</strong></div>
+          <div class="metric"><span>מוצרים פעילים</span><strong>${state.products.filter((item) => item.active).length}</strong></div>
+          <div class="metric"><span>הזמנות פתוחות</span><strong>${openOrders.length}</strong></div>
+          <div class="metric"><span>שולם בדמו</span><strong>${shekel(revenue)}</strong></div>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h2>הזמנות קרובות</h2><button class="button primary" data-goto="orders" type="button">הזמנה חדשה</button></div>
+            ${ordersTable(state.orders.slice().sort((a, b) => (a.deliveryDate || '').localeCompare(b.deliveryDate || '')).slice(0, 6))}
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>תשומת לב</h2></div>
+            <div class="list">
+              <div class="delivery-card cash"><strong>${cash.length} הזמנות מזומן לשליח</strong><br><span class="muted">צריך לוודא גבייה וסימון ידני.</span></div>
+              <div class="delivery-card"><strong>Grow / משולם עדיין stub</strong><br><span class="muted">כפתור קישור תשלום יוצר URL בדיקה בלבד.</span></div>
+              <div class="delivery-card"><strong>פורטל לקוח בשלב הבא</strong><br><span class="muted">טלפון + סיסמה והחלפת סיסמה ראשונה כבר מוגדרים באפיון.</span></div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function customersView() {
+      return `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h2>לקוחות</h2><input id="customerSearch" placeholder="חיפוש לפי שם, טלפון או עיר"></div>
+            <div class="table-wrap">${customersTable(state.customers)}</div>
+          </div>
+          <form class="panel form-grid" id="customerForm">
+            <div class="field full"><h2>לקוח חדש / עריכה</h2></div>
+            ${hiddenId('customerId')}
+            ${field('שם', 'customerName')}
+            ${field('טלפון', 'customerPhone')}
+            ${field('כתובת', 'customerAddress')}
+            ${field('עיר', 'customerCity')}
+            ${field('אזור', 'customerArea')}
+            <div class="field"><label>פעיל</label><select id="customerActive"><option value="true">כן</option><option value="false">לא</option></select></div>
+            ${area('הערות משלוח', 'customerDeliveryNotes')}
+            ${area('הערות פנימיות', 'customerInternalNotes')}
+            <div class="field full toolbar"><button class="button primary" type="submit">שמירה</button><button class="button ghost" id="clearCustomer" type="button">ניקוי</button></div>
+          </form>
+        </div>`;
+    }
+
+    function customersTable(rows) {
+      return `<table><thead><tr><th>שם</th><th>טלפון</th><th>עיר/אזור</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>${rows.map((item) => `
+        <tr>
+          <td><strong>${item.name}</strong><br><span class="muted">${item.address}</span></td>
+          <td class="nowrap">${item.phone}</td>
+          <td>${item.city}<br><span class="muted">${item.area}</span></td>
+          <td><span class="status ${item.active ? 'ok' : 'danger'}">${item.active ? 'פעיל' : 'לא פעיל'}</span></td>
+          <td><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button></div></td>
+        </tr>`).join('')}</tbody></table>`;
+    }
+
+    function productsView() {
+      return `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h2>מוצרים</h2></div>
+            <div class="table-wrap">${productsTable()}</div>
+          </div>
+          <form class="panel form-grid" id="productForm">
+            <div class="field full"><h2>מוצר חדש / עריכה</h2></div>
+            ${hiddenId('productId')}
+            ${field('מותג', 'productBrand')}
+            ${field('סדרה', 'productSeries')}
+            ${field('חיה', 'productAnimal')}
+            ${field('שלב חיים', 'productStage')}
+            ${field('טעם', 'productFlavor')}
+            ${field('משקל ק"ג', 'productWeight', 'number')}
+            ${field('שם תצוגה', 'productName')}
+            ${field('מחיר בסיס', 'productPrice', 'number')}
+            <div class="field"><label>פעיל</label><select id="productActive"><option value="true">כן</option><option value="false">לא</option></select></div>
+            <div class="field full toolbar"><button class="button primary" type="submit">שמירה</button><button class="button ghost" id="clearProduct" type="button">ניקוי</button></div>
+          </form>
+        </div>`;
+    }
+
+    function productsTable() {
+      return `<table><thead><tr><th>מוצר</th><th>מאפיינים</th><th>מחיר בסיס</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>${state.products.map((item) => `
+        <tr>
+          <td><strong>${item.name}</strong><br><span class="muted">${item.brand} ${item.series}</span></td>
+          <td>${item.animal} / ${item.stage}<br><span class="muted">${item.flavor}, ${item.weightKg} ק"ג</span></td>
+          <td>${shekel(item.basePrice)}</td>
+          <td><span class="status ${item.active ? 'ok' : 'danger'}">${item.active ? 'פעיל' : 'לא פעיל'}</span></td>
+          <td><button class="mini" data-edit-product="${item.id}" type="button">עריכה</button></td>
+        </tr>`).join('')}</tbody></table>`;
+    }
+
+    function pricingView() {
+      return `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h2>מחירים אישיים</h2></div>
+            <div class="table-wrap"><table><thead><tr><th>לקוח</th><th>מוצר</th><th>מחיר אישי</th><th>הנחה</th><th>מחיר להזמנה</th><th>פעולות</th></tr></thead><tbody>${state.prices.map((item) => `
+              <tr>
+                <td>${customer(item.customerId)?.name || '-'}</td>
+                <td>${product(item.productId)?.name || '-'}</td>
+                <td>${Number(item.customPrice || 0) > 0 ? shekel(item.customPrice) : '-'}</td>
+                <td>${item.discountPercent || 0}%</td>
+                <td><strong>${shekel(priceFor(item.customerId, item.productId))}</strong></td>
+                <td><button class="mini" data-delete-price="${item.id}" type="button">מחיקה</button></td>
+              </tr>`).join('')}</tbody></table></div>
+          </div>
+          <form class="panel form-grid" id="priceForm">
+            <div class="field full"><h2>הוספת כלל מחיר</h2></div>
+            <div class="field full"><label>לקוח</label>${customerSelect('priceCustomer')}</div>
+            <div class="field full"><label>מוצר</label>${productSelect('priceProduct')}</div>
+            ${field('מחיר אישי', 'customPrice', 'number')}
+            ${field('הנחה %', 'discountPercent', 'number')}
+            ${area('הערות', 'priceNotes')}
+            <div class="field full toolbar"><button class="button primary" type="submit">שמירה</button></div>
+          </form>
+        </div>`;
+    }
+
+    function ordersView() {
+      return `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h2>הזמנות</h2></div>
+            <div class="filters">
+              <select id="orderPaymentFilter"><option value="">כל התשלומים</option><option value="pending_online_payment">ממתין לתשלום</option><option value="cash_on_delivery">מזומן לשליח</option><option value="paid_online">שולם אונליין</option><option value="paid_cash">שולם במזומן</option></select>
+              <input id="orderAreaFilter" placeholder="סינון עיר/אזור">
+              <input id="orderDateFilter" type="date">
+              <button class="button ghost" id="clearOrderFilters" type="button">ניקוי</button>
+            </div>
+            <div id="ordersTable">${ordersTable(state.orders)}</div>
+          </div>
+          <form class="panel order-builder" id="orderForm">
+            <h2>הזמנה ידנית</h2>
+            <div class="field"><label>לקוח</label>${customerSelect('orderCustomer')}</div>
+            <div id="orderItems"></div>
+            <button class="button ghost" id="addOrderItem" type="button">הוספת מוצר</button>
+            <div class="form-grid">
+              <div class="field"><label>תאריך אספקה</label><input id="deliveryDate" type="date" value="${today()}"></div>
+              <div class="field"><label>סטטוס תשלום</label><select id="paymentStatus"><option value="pending_online_payment">ממתין לתשלום</option><option value="cash_on_delivery">מזומן לשליח</option><option value="paid_cash">שולם במזומן</option><option value="paid_online">שולם אונליין</option></select></div>
+            </div>
+            ${area('הערות', 'orderNotes')}
+            <div class="total-line"><span>סה"כ</span><span id="orderTotal">₪0</span></div>
+            <button class="button primary" type="submit">יצירת הזמנה</button>
+          </form>
+        </div>`;
+    }
+
+    function ordersTable(rows) {
+      if (!rows.length) return '<div class="empty">אין הזמנות להצגה</div>';
+      return `<div class="table-wrap"><table><thead><tr><th>מספר</th><th>לקוח</th><th>אספקה</th><th>פריטים</th><th>סה"כ</th><th>תשלום</th><th>פעולות</th></tr></thead><tbody>${rows.map((order) => {
+        const c = customer(order.customerId);
+        return `<tr>
+          <td><strong>${order.id}</strong><br><span class="muted">${order.createdAt}</span></td>
+          <td>${c?.name || '-'}<br><span class="muted">${c ? `${c.city} / ${c.area}` : ''}</span></td>
+          <td>${order.deliveryDate || '-'}<br><span class="status ${statusClass(order.status)}">${statusLabel(order.status)}</span></td>
+          <td>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</td>
+          <td><strong>${shekel(orderTotal(order))}</strong></td>
+          <td><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span></td>
+          <td><div class="row-actions"><button class="mini" data-pay-link="${order.id}" type="button">קישור תשלום</button><button class="mini" data-mark-paid="${order.id}" type="button">סמן שולם</button><button class="mini" data-delivered="${order.id}" type="button">סופק</button></div></td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+    }
+
+    function deliveriesView() {
+      const rows = state.orders.slice().sort((a, b) => (a.deliveryDate || '').localeCompare(b.deliveryDate || ''));
+      return `
+        <div class="panel">
+          <div class="panel-head"><h2>משלוחים קרובים</h2><input id="deliveryFilter" placeholder="סינון לפי עיר, אזור או לקוח"></div>
+          <div class="list" id="deliveryList">${deliveryCards(rows)}</div>
+        </div>`;
+    }
+
+    function deliveryCards(rows) {
+      if (!rows.length) return '<div class="empty">אין משלוחים להצגה</div>';
+      return rows.map((order) => {
+        const c = customer(order.customerId);
+        const cash = order.paymentStatus === 'cash_on_delivery';
+        return `<article class="delivery-card ${cash ? 'cash' : ''}">
+          <strong>${order.deliveryDate || 'ללא תאריך'} | ${c?.name || '-'}</strong>
+          <p class="muted">${c?.address || ''}, ${c?.city || ''} | ${c?.area || ''}</p>
+          <p>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</p>
+          <p><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span> <strong>${shekel(orderTotal(order))}</strong></p>
+          ${order.notes ? `<p class="muted">${order.notes}</p>` : ''}
+        </article>`;
+      }).join('');
+    }
+
+    function settingsView() {
+      return `
+        <div class="grid">
+          <div class="panel"><div class="panel-head"><h2>סטטוסים חיצוניים</h2></div>
+            <div class="grid metrics">
+              <div class="metric"><span>Grow / משולם</span><strong>Stub</strong></div>
+              <div class="metric"><span>לינק סיסמה ראשוני</span><strong>TBD</strong></div>
+              <div class="metric"><span>ייבוא לקוחות</span><strong>TBD</strong></div>
+              <div class="metric"><span>חשבוניות מזומן</span><strong>TBD</strong></div>
+            </div>
+          </div>
+          <div class="panel"><h2>כללי אבטחה שנקבעו</h2><p class="muted">לקוחות נוצרים רק על ידי בעל העסק. בפורטל הלקוח העתידי תהיה כניסה עם טלפון וסיסמה, סיסמה זמנית/לינק ראשוני, והחלפת סיסמה חובה בכניסה הראשונה.</p></div>
+        </div>`;
+    }
+
+    function field(labelText, id, type = 'text') {
+      return `<div class="field"><label>${labelText}</label><input id="${id}" type="${type}"></div>`;
+    }
+
+    function area(labelText, id) {
+      return `<div class="field full"><label>${labelText}</label><textarea id="${id}"></textarea></div>`;
+    }
+
+    function hiddenId(id) {
+      return `<input id="${id}" type="hidden">`;
+    }
+
+    function customerSelect(id) {
+      return `<select id="${id}">${state.customers.filter((item) => item.active).map((item) => `<option value="${item.id}">${item.name} | ${item.phone}</option>`).join('')}</select>`;
+    }
+
+    function productSelect(id) {
+      return `<select id="${id}">${state.products.filter((item) => item.active).map((item) => `<option value="${item.id}">${item.name} | ${shekel(item.basePrice)}</option>`).join('')}</select>`;
+    }
+
+    function bindView() {
+      document.querySelectorAll('[data-goto]').forEach((button) => button.addEventListener('click', () => { currentTab = button.dataset.goto; render(); }));
+      bindCustomers();
+      bindProducts();
+      bindPricing();
+      bindOrders();
+      bindDeliveries();
+    }
+
+    function bindCustomers() {
+      const form = document.getElementById('customerForm');
+      if (!form) return;
+      document.getElementById('customerSearch').addEventListener('input', (event) => {
+        const q = event.target.value.trim().toLowerCase();
+        const rows = state.customers.filter((item) => [item.name, item.phone, item.city, item.area].join(' ').toLowerCase().includes(q));
+        document.querySelector('.table-wrap').innerHTML = customersTable(rows);
+        bindCustomerRows();
+      });
+      bindCustomerRows();
+      document.getElementById('clearCustomer').addEventListener('click', () => form.reset());
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const id = document.getElementById('customerId').value || nextId('c', state.customers);
+        const item = {
+          id,
+          name: value('customerName'),
+          phone: value('customerPhone'),
+          address: value('customerAddress'),
+          city: value('customerCity'),
+          area: value('customerArea'),
+          deliveryNotes: value('customerDeliveryNotes'),
+          internalNotes: value('customerInternalNotes'),
+          active: value('customerActive') === 'true'
+        };
+        if (!item.name || !item.phone) return toast('צריך שם וטלפון ללקוח');
+        upsert(state.customers, item);
+        saveState('לקוח נשמר');
+      });
+    }
+
+    function bindCustomerRows() {
+      document.querySelectorAll('[data-edit-customer]').forEach((button) => button.addEventListener('click', () => fillCustomer(button.dataset.editCustomer)));
+      document.querySelectorAll('[data-order-customer]').forEach((button) => button.addEventListener('click', () => { state.selected.customerId = button.dataset.orderCustomer; currentTab = 'orders'; render(); }));
+    }
+
+    function fillCustomer(id) {
+      const item = customer(id);
+      if (!item) return;
+      setValue('customerId', item.id);
+      setValue('customerName', item.name);
+      setValue('customerPhone', item.phone);
+      setValue('customerAddress', item.address);
+      setValue('customerCity', item.city);
+      setValue('customerArea', item.area);
+      setValue('customerDeliveryNotes', item.deliveryNotes);
+      setValue('customerInternalNotes', item.internalNotes);
+      setValue('customerActive', String(item.active));
+    }
+
+    function bindProducts() {
+      const form = document.getElementById('productForm');
+      if (!form) return;
+      document.querySelectorAll('[data-edit-product]').forEach((button) => button.addEventListener('click', () => fillProduct(button.dataset.editProduct)));
+      document.getElementById('clearProduct').addEventListener('click', () => form.reset());
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const id = value('productId') || nextId('p', state.products);
+        const item = {
+          id,
+          brand: value('productBrand'),
+          series: value('productSeries'),
+          animal: value('productAnimal'),
+          stage: value('productStage'),
+          flavor: value('productFlavor'),
+          weightKg: Number(value('productWeight') || 0),
+          name: value('productName'),
+          basePrice: Number(value('productPrice') || 0),
+          active: value('productActive') === 'true'
+        };
+        if (!item.name || !item.basePrice) return toast('צריך שם מוצר ומחיר בסיס');
+        upsert(state.products, item);
+        saveState('מוצר נשמר');
+      });
+    }
+
+    function fillProduct(id) {
+      const item = product(id);
+      if (!item) return;
+      setValue('productId', item.id);
+      setValue('productBrand', item.brand);
+      setValue('productSeries', item.series);
+      setValue('productAnimal', item.animal);
+      setValue('productStage', item.stage);
+      setValue('productFlavor', item.flavor);
+      setValue('productWeight', item.weightKg);
+      setValue('productName', item.name);
+      setValue('productPrice', item.basePrice);
+      setValue('productActive', String(item.active));
+    }
+
+    function bindPricing() {
+      const form = document.getElementById('priceForm');
+      if (!form) return;
+      document.querySelectorAll('[data-delete-price]').forEach((button) => button.addEventListener('click', () => {
+        state.prices = state.prices.filter((item) => item.id !== button.dataset.deletePrice);
+        saveState('כלל מחיר נמחק');
+      }));
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const item = {
+          id: nextId('cp', state.prices),
+          customerId: value('priceCustomer'),
+          productId: value('priceProduct'),
+          customPrice: Number(value('customPrice') || 0),
+          discountPercent: Number(value('discountPercent') || 0),
+          notes: value('priceNotes')
+        };
+        state.prices = state.prices.filter((price) => !(price.customerId === item.customerId && price.productId === item.productId));
+        state.prices.push(item);
+        saveState('מחיר אישי נשמר');
+      });
+    }
+
+    function bindOrders() {
+      const form = document.getElementById('orderForm');
+      if (!form) return;
+      const customerSelectNode = document.getElementById('orderCustomer');
+      if (state.selected.customerId) customerSelectNode.value = state.selected.customerId;
+      renderOrderItems([{ productId: state.selected.productId || state.products[0]?.id, quantity: 1 }]);
+      customerSelectNode.addEventListener('change', recalcOrder);
+      document.getElementById('addOrderItem').addEventListener('click', () => {
+        const items = readOrderItems();
+        items.push({ productId: state.products[0]?.id, quantity: 1 });
+        renderOrderItems(items);
+      });
+      document.getElementById('clearOrderFilters').addEventListener('click', () => {
+        setValue('orderPaymentFilter', '');
+        setValue('orderAreaFilter', '');
+        setValue('orderDateFilter', '');
+        filterOrders();
+      });
+      ['orderPaymentFilter', 'orderAreaFilter', 'orderDateFilter'].forEach((id) => document.getElementById(id).addEventListener('input', filterOrders));
+      bindOrderActionButtons();
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const customerId = value('orderCustomer');
+        const items = readOrderItems().map((item) => ({ ...item, unitPrice: priceFor(customerId, item.productId) })).filter((item) => item.productId && item.quantity > 0);
+        if (!items.length) return toast('צריך לפחות פריט אחד');
+        const id = nextId('o', state.orders);
+        const paymentStatus = value('paymentStatus');
+        state.orders.push({
+          id,
+          customerId,
+          createdAt: today(),
+          deliveryDate: value('deliveryDate'),
+          status: paymentStatus === 'paid_online' || paymentStatus === 'paid_cash' ? 'confirmed' : 'new',
+          paymentStatus,
+          source: 'manual',
+          paymentUrl: paymentStatus === 'pending_online_payment' ? `https://pay.example.test/orders/${id}` : '',
+          notes: value('orderNotes'),
+          items
+        });
+        saveState('הזמנה נוצרה');
+      });
+    }
+
+    function renderOrderItems(items) {
+      document.getElementById('orderItems').innerHTML = items.map((item, index) => `
+        <div class="item-row" data-order-row>
+          <div class="field"><label>מוצר</label>${productSelect(`orderProduct${index}`)}</div>
+          <div class="field"><label>כמות</label><input id="orderQty${index}" type="number" min="1" value="${item.quantity || 1}"></div>
+          <button class="mini" data-remove-order-item="${index}" type="button">×</button>
+        </div>`).join('');
+      items.forEach((item, index) => {
+        setValue(`orderProduct${index}`, item.productId);
+        document.getElementById(`orderProduct${index}`).addEventListener('change', recalcOrder);
+        document.getElementById(`orderQty${index}`).addEventListener('input', recalcOrder);
+      });
+      document.querySelectorAll('[data-remove-order-item]').forEach((button) => button.addEventListener('click', () => {
+        const next = readOrderItems().filter((_, index) => index !== Number(button.dataset.removeOrderItem));
+        renderOrderItems(next.length ? next : [{ productId: state.products[0]?.id, quantity: 1 }]);
+      }));
+      recalcOrder();
+    }
+
+    function readOrderItems() {
+      return Array.from(document.querySelectorAll('[data-order-row]')).map((_, index) => ({
+        productId: value(`orderProduct${index}`),
+        quantity: Number(value(`orderQty${index}`) || 0)
+      }));
+    }
+
+    function recalcOrder() {
+      const customerId = value('orderCustomer');
+      const total = readOrderItems().reduce((sum, item) => sum + priceFor(customerId, item.productId) * item.quantity, 0);
+      document.getElementById('orderTotal').textContent = shekel(total);
+    }
+
+    function filterOrders() {
+      const payment = value('orderPaymentFilter');
+      const area = value('orderAreaFilter').toLowerCase();
+      const date = value('orderDateFilter');
+      const rows = state.orders.filter((order) => {
+        const c = customer(order.customerId);
+        const areaText = [c?.city, c?.area, c?.name].join(' ').toLowerCase();
+        return (!payment || order.paymentStatus === payment) && (!area || areaText.includes(area)) && (!date || order.deliveryDate === date);
+      });
+      document.getElementById('ordersTable').innerHTML = ordersTable(rows);
+      bindOrderActionButtons();
+    }
+
+    function bindOrderActionButtons() {
+      document.querySelectorAll('[data-pay-link]').forEach((button) => button.addEventListener('click', () => {
+        const order = state.orders.find((item) => item.id === button.dataset.payLink);
+        if (!order.paymentUrl) order.paymentUrl = `https://pay.example.test/orders/${order.id}`;
+        navigator.clipboard?.writeText(order.paymentUrl);
+        saveState('קישור תשלום דמו נוצר והועתק אם הדפדפן מאפשר');
+      }));
+      document.querySelectorAll('[data-mark-paid]').forEach((button) => button.addEventListener('click', () => {
+        const order = state.orders.find((item) => item.id === button.dataset.markPaid);
+        order.paymentStatus = 'paid_online';
+        order.status = 'confirmed';
+        saveState('הזמנה סומנה כשולמה');
+      }));
+      document.querySelectorAll('[data-delivered]').forEach((button) => button.addEventListener('click', () => {
+        const order = state.orders.find((item) => item.id === button.dataset.delivered);
+        order.status = 'delivered';
+        saveState('הזמנה סומנה כסופקה');
+      }));
+    }
+
+    function bindDeliveries() {
+      const filter = document.getElementById('deliveryFilter');
+      if (!filter) return;
+      filter.addEventListener('input', () => {
+        const q = filter.value.trim().toLowerCase();
+        const rows = state.orders.filter((order) => {
+          const c = customer(order.customerId);
+          return [c?.name, c?.city, c?.area, c?.address].join(' ').toLowerCase().includes(q);
+        });
+        document.getElementById('deliveryList').innerHTML = deliveryCards(rows);
+      });
+    }
+
+    function value(id) {
+      return document.getElementById(id)?.value?.trim() || '';
+    }
+
+    function setValue(id, val) {
+      const node = document.getElementById(id);
+      if (node) node.value = val ?? '';
+    }
+
+    function upsert(list, item) {
+      const index = list.findIndex((existing) => existing.id === item.id);
+      if (index >= 0) list[index] = item;
+      else list.push(item);
+    }
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `drive-dog-demo-${today()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('לאפס את נתוני הדמו בדפדפן?')) return;
+      state = clone(seed);
+      saveState('הדמו אופס');
+    });
+
+    render();
+  </script>
+</body>
+</html>

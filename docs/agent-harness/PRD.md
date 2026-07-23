@@ -27,7 +27,7 @@ delivery planning.
 
 ### End Customer
 
-An existing customer can enter with a phone number and temporary code, browse
+An existing customer can enter with a phone number and password, browse
 the catalog, reorder past products, create an order, and choose payment.
 
 ## Business Snapshot
@@ -56,7 +56,9 @@ the catalog, reorder past products, create an order, and choose payment.
 ### Customer Portal
 
 - Phone number entry.
-- Temporary code login.
+- Password login.
+- Temporary password or setup link after owner creates the customer.
+- Forced password change on first login.
 - Customer sees only their own data.
 - No open self-registration.
 - No public signup.
@@ -124,7 +126,8 @@ payment status.
 ## Success Criteria
 
 - Business owner can create a customer and product.
-- Existing customer can log in with phone and temporary code.
+- Existing customer can log in with phone and password.
+- Existing customer is forced to change a temporary password on first login.
 - Customer can place an order with multiple products.
 - Manual orders can be created by the owner.
 - Online payment link can be generated.

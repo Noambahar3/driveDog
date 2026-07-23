@@ -25,7 +25,8 @@ touch external services.
 
 ## Integration Preflight
 
-Use before work involving Grow / Meshulam, SMS/OTP, email, or deployment.
+Use before work involving Grow / Meshulam, password setup messaging, email, or
+deployment.
 
 - Read `GROW_INTEGRATION_CHECK.md` when relevant.
 - Use official provider documentation or verified credentials only.
@@ -68,4 +69,3 @@ Stop and ask Noam before proceeding if:
 - There are conflicting product decisions.
 - A destructive command would be needed.
 - The same approach fails three times.
-

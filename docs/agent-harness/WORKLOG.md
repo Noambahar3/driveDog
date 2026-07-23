@@ -11,7 +11,8 @@ changes. Keep entries short and factual.
 - Product direction: closed CRM and ordering system for recurring private
   dog/cat food customers.
 - Business owner creates customers; customers do not self-register.
-- Customer login should use phone number and temporary code.
+- Customer login should use phone number and password. Owner-created customers
+  receive a temporary password or setup link, and must change it on first login.
 - MVP includes customer management, product catalog, customer prices/discounts,
   customer orders, manual orders, Grow / Meshulam payment links, payment status,
   invoices for online payments, and delivery list.
@@ -56,7 +57,8 @@ changes. Keep entries short and factual.
 
 - Created `FIRST_IMPLEMENTATION_SLICE.md`.
 - Readiness verdict: PRD/SPEC are sufficient for an owner-side first scaffold if
-  customer portal, OTP, and live Grow / Meshulam calls are deferred.
+  customer portal, password setup automation, and live Grow / Meshulam calls are
+  deferred.
 - Existing-solutions preflight checked Medusa, Vendure, Saleor, and Refine.
 - Recommendation: start custom small scaffold on `dev` after Noam approves slice
   assumptions.
@@ -68,3 +70,14 @@ changes. Keep entries short and factual.
   owner.
 - Public signup, anonymous checkout, and open storefront behavior are outside
   the intended product direction.
+
+### Owner Admin MVP Started
+
+- Built a static owner-admin MVP at `admin.html`.
+- Build now copies it to `dist/admin.html` and serves it from `/admin` in the
+  generated worker.
+- Current scope includes dashboard, customers, products, customer-specific
+  pricing, manual orders, delivery list, settings/stubs, demo seed data, and
+  localStorage persistence.
+- Grow / Meshulam remains a payment-link stub only. No live charges or external
+  API calls are made.

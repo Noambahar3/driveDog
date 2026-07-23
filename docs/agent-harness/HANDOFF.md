@@ -79,6 +79,5 @@ Must confirm before use:
 
 - Framework and hosting choice.
 - Database choice.
-- OTP provider.
+- Initial password/setup-link delivery provider.
 - Whether customer import is required for first release.
-

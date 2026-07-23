@@ -6,8 +6,8 @@ Use with: `PRD.md`, `CHECKS.md`, and `GROW_INTEGRATION_CHECK.md`
 ## System Overview
 
 Drive Dog is a closed CRM and ordering system for recurring private customers.
-The business owner creates customers. Customers then use phone-code login to
-order food products from a structured catalog.
+The business owner creates customers. Customers then use phone and password
+login to order food products from a structured catalog.
 
 This system must not behave like an open public store. There is no anonymous
 checkout, no open registration, and no order placement for customers that the
@@ -36,6 +36,8 @@ business owner has not created or approved.
 - `city`
 - `area`
 - `delivery_notes`
+- `password_hash`
+- `must_change_password`
 - `internal_notes`
 - `is_active`
 - `created_at`
@@ -160,8 +162,10 @@ Allowed `source` values:
 
 ## Customer Login
 
-- Login uses phone number and temporary code.
-- Code TTL: TBD, recommended 5-10 minutes.
+- Login uses phone number and password.
+- Owner-created customers receive a temporary password or one-time setup link.
+- First login with a temporary password must require password change.
+- Passwords are stored as hashes only.
 - Max attempts: TBD, recommended 5 attempts before temporary lock.
 - Unknown phone numbers should receive a generic response.
 - Customers cannot create accounts by themselves.
@@ -240,7 +244,7 @@ Signature behavior:
 - Framework: TBD
 - Database: TBD
 - Hosting: TBD
-- SMS/OTP provider: TBD
+- Initial password/setup-link delivery provider: TBD
 - Email/signature backend provider: TBD
 - Grow / Meshulam credentials: TBD
 - Initial customer import method: TBD

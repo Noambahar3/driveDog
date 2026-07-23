@@ -61,12 +61,12 @@ answers change product behavior, implementation, or commercial scope.
 - If not, should the owner issue cash invoices manually or should another
   invoice provider be connected?
 
-## OTP / Messaging
+## Password Setup / Messaging
 
-- Should login codes be sent by SMS first?
-- Is WhatsApp OTP required for MVP or later?
+- Should first-login setup links be sent manually, by SMS, or by WhatsApp?
+- Is automated password reset required for MVP or later?
 - Which sender/business number should customers recognize?
-- What is the acceptable monthly cost for OTP messages?
+- What is the acceptable monthly cost for setup/reset messages?
 
 ## Proposal / Signature
 
@@ -82,4 +82,3 @@ answers change product behavior, implementation, or commercial scope.
 - Who will create the first catalog?
 - What is the first real test order scenario?
 - What date is targeted for pilot use?
-

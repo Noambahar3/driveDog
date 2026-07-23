@@ -43,12 +43,12 @@ Still open:
 - Whether initial customer import is required.
 - Whether Grow / Meshulam can issue cash-on-delivery invoice documents through
   API.
-- OTP provider and email/signature backend provider.
+- Initial password/setup-link delivery and email/signature backend provider.
 
 Recommendation:
 
 - Start implementation with owner-side foundations and manual orders.
-- Keep customer portal, OTP, and live Grow integration for later slices.
+- Keep customer portal, password setup automation, and live Grow integration for later slices.
 - Use placeholders and stubs for open integration points.
 
 ## Existing-Solutions Preflight
@@ -71,7 +71,7 @@ Assessment:
   substantial commerce assumptions, setup, and integration surface for a small
   closed CRM with about 100 customers and 30-40 products.
 - Drive Dog explicitly should not be modeled as an open storefront. Any future
-  customer-facing catalog must sit behind phone-code access for customers
+  customer-facing catalog must sit behind phone/password access for customers
   approved by the business owner.
 - Drive Dog's first slice needs custom CRM behavior, manual orders, local
   pricing rules, simple delivery views, and Grow-specific payment stubs more
@@ -110,7 +110,7 @@ Build an owner-first working skeleton with local/stubbed data flows:
 
 - It validates the most important operational pain: disorder around customers,
   products, orders, payments, and deliveries.
-- It does not require OTP provider selection.
+- It does not require password setup delivery provider selection.
 - It does not require live payment credentials.
 - It does not require a final customer-facing UX.
 - It creates the data model the customer portal will later use.
@@ -120,7 +120,7 @@ Build an owner-first working skeleton with local/stubbed data flows:
 Do not build these in slice 1:
 
 - Customer portal.
-- Phone-code OTP login.
+- Customer password login.
 - Public storefront.
 - Public signup.
 - Anonymous checkout.
@@ -320,7 +320,7 @@ Purpose:
 Stub cards:
 
 - Grow / Meshulam: not connected
-- OTP provider: not selected
+- Password setup delivery provider: not selected
 - Email/signature backend: not selected
 - Customer import: not configured
 
@@ -343,7 +343,6 @@ Optional in slice 1:
 
 Do not implement yet:
 
-- `otp_codes`
 - `sessions`
 - `webhook_events` with production semantics
 - `imports`
@@ -373,12 +372,12 @@ Stub behavior:
 - Show invoice status as `pending_provider`.
 - Do not generate official invoice documents.
 
-### OTP Stub
+### Customer Login Stub
 
 Stub behavior:
 
 - No customer portal login in slice 1.
-- Settings page marks OTP provider as `TBD`.
+- Settings page marks password setup delivery provider as `TBD`.
 
 ### Signature / Email Stub
 
@@ -416,7 +415,7 @@ It is safe to open branch `dev` and start the first scaffold if Noam approves
 these assumptions:
 
 - Slice 1 is owner-side only.
-- Customer portal and OTP wait for slice 2.
+- Customer portal and password setup automation wait for slice 2.
 - Grow / Meshulam is stubbed only in slice 1.
 - The first scaffold may use placeholder auth for owner access.
 - Delivery date can be modeled as a nullable/requested date field until the
@@ -425,7 +424,7 @@ these assumptions:
 Information still needed before slice 2:
 
 - Exact customer delivery-date behavior.
-- OTP provider.
+- Initial password/setup-link delivery provider.
 - Real Grow / Meshulam credentials.
 - Invoice behavior for cash-on-delivery.
 - Pricing precedence confirmation.

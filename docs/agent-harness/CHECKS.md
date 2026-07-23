@@ -4,9 +4,9 @@
 
 ### Customer Access
 
-- Existing customer can request a temporary code.
+- Existing customer can log in with phone and password.
+- First login with a temporary password forces password change.
 - Unknown phone number receives a generic response.
-- Code expires after configured TTL.
 - Attempts are limited.
 - Customer sees only their own data.
 - Customer cannot self-register.
@@ -86,4 +86,3 @@
 - Webhook processing is idempotent.
 - Amount and order ID are verified before marking paid.
 - bit / Apple Pay / Google Pay live testing is not run without approval.
-
