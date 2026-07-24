@@ -257,7 +257,7 @@
   <main class="wrap">
     <section class="summary" aria-label="סיכום">
       <div class="metric"><span>יחידות עבודה</span><strong>11</strong></div>
-      <div class="metric"><span>סטטוס</span><strong>Pending</strong></div>
+      <div class="metric"><span>סטטוס</span><strong>ממתין</strong></div>
       <div class="metric"><span>מקור אמת</span><strong>DB</strong></div>
       <div class="metric"><span>מובייל</span><strong>חובה</strong></div>
     </section>
@@ -290,143 +290,143 @@
   <script>
     const tasks = [
       {
-        title: "Current Screen Audit",
+        title: "מיפוי המסך הקיים",
         branch: "docs/customer-screen-audit",
         items: [
-          "Current static customer behavior is documented.",
-          "Current list columns, form fields, and actions are documented.",
-          "Demo-only localStorage behavior is documented.",
-          "Gaps to backend / DB implementation are listed.",
-          "No product behavior is changed."
+          "ההתנהגות הנוכחית של מסך הלקוחות הסטטי מתועדת.",
+          "עמודות הרשימה, שדות הטופס והפעולות הקיימות מתועדים.",
+          "השימוש ב-localStorage כדמו בלבד מתועד.",
+          "הפערים למימוש אמיתי מול backend / DB רשומים.",
+          "אין שינוי בהתנהגות המוצר."
         ]
       },
       {
-        title: "Customer Data Model",
+        title: "מודל נתוני לקוח",
         branch: "feat/customer-screen-data-model",
         items: [
-          "Customer records persist in backend / DB.",
-          "Hard refresh does not lose customer changes.",
-          "Fields exist for customer details, password setup, must-change-password, and deleted timestamp.",
-          "Phone uniqueness is enforced.",
-          "Deleted customers are retained for deleted-customers page/archive.",
-          "Demo customer records exist for tests.",
-          "No Excel/CSV import is built in this scope."
+          "רשומות לקוח נשמרות ב-backend / DB.",
+          "רענון מלא של הדף לא מאבד שינויים בלקוח.",
+          "קיימים שדות לפרטי לקוח, הגדרת סיסמה, חובת שינוי סיסמה וזמן מחיקה.",
+          "ייחודיות טלפון נאכפת.",
+          "לקוחות מחוקים נשמרים לדף/ארכיון לקוחות מחוקים.",
+          "קיימות רשומות לקוח דמה לבדיקות.",
+          "לא ממומש ייבוא Excel/CSV בשלב הזה."
         ]
       },
       {
-        title: "Customer List",
+        title: "רשימת לקוחות",
         branch: "feat/customer-screen-list",
         items: [
-          "List loads from backend / DB.",
-          "Table columns include full name, phone, city, last order date, order count, total purchases, and actions.",
-          "Search works by full name, address, phone, and city.",
-          "Row actions include open/view, edit, delete.",
-          "Deleted customers are not shown in the main list.",
-          "Empty, loading, and error states exist.",
-          "Mobile table/list is usable without horizontal overflow."
+          "הרשימה נטענת מה-backend / DB.",
+          "עמודות הטבלה כוללות שם מלא, טלפון, עיר, הזמנה אחרונה, מספר הזמנות, סך רכישות ופעולות.",
+          "החיפוש עובד לפי שם מלא, כתובת, טלפון ועיר.",
+          "פעולות שורה כוללות פתיחה/צפייה, עריכה ומחיקה.",
+          "לקוחות מחוקים לא מופיעים ברשימה הראשית.",
+          "קיימים מצבי ריק, טעינה ושגיאה.",
+          "הטבלה/רשימה שמישה במובייל בלי גלילה אופקית בעייתית."
         ]
       },
       {
-        title: "Customer Create / Edit / Delete",
+        title: "יצירה, עריכה ומחיקת לקוח",
         branch: "feat/customer-screen-edit-delete",
         items: [
-          "Owner/employee can create customer.",
-          "Owner/employee can edit first name, last name, phone, address, city, delivery notes.",
-          "Required validation exists for first name, last name, and phone.",
-          "Duplicate phone error is clear.",
-          "Save failure does not show success or mutate state incorrectly.",
-          "Delete requires confirmation.",
-          "Delete moves customer to deleted-customers page/archive.",
-          "Address change updates the customer's orders accordingly.",
-          "Delivery notes do not automatically copy into new orders."
+          "בעל העסק/עובד יכול ליצור לקוח.",
+          "בעל העסק/עובד יכול לערוך שם, שם משפחה, טלפון, כתובת, עיר והערות משלוח.",
+          "קיימת ולידציה לשם, שם משפחה וטלפון.",
+          "שגיאת טלפון כפול ברורה למשתמש.",
+          "כשל שמירה לא מציג הצלחה ולא משנה מצב בצורה שגויה.",
+          "מחיקה דורשת אישור.",
+          "מחיקה מעבירה את הלקוח לדף/ארכיון לקוחות מחוקים.",
+          "שינוי כתובת מעדכן את הזמנות הלקוח בהתאם.",
+          "הערות משלוח לא מועתקות אוטומטית להזמנות חדשות."
         ]
       },
       {
-        title: "Deleted Customers Page",
+        title: "דף לקוחות מחוקים",
         branch: "feat/customer-screen-deleted-customers",
         items: [
-          "Separate page/view shows deleted customers.",
-          "Deleted customer includes full name, phone, city, deleted date when available, and open/view action.",
-          "Deleted customers do not appear in active customer selects by default.",
-          "Restoring customer is not required unless explicitly added later.",
-          "Mobile view is usable."
+          "דף/תצוגה נפרדים מציגים לקוחות מחוקים.",
+          "לקוח מחוק מציג שם מלא, טלפון, עיר, תאריך מחיקה אם קיים ופעולת פתיחה/צפייה.",
+          "לקוחות מחוקים לא מופיעים כברירת מחדל בבחירת לקוח להזמנה.",
+          "שחזור לקוח לא נדרש אלא אם יתווסף במפורש בהמשך.",
+          "התצוגה שמישה במובייל."
         ]
       },
       {
-        title: "Customer Detail",
+        title: "פרופיל לקוח",
         branch: "feat/customer-screen-detail",
         items: [
-          "Profile areas/tabs: details, orders, invoices, metrics, password reset.",
-          "Details show full name, phone, address, city, delivery notes.",
-          "Orders summary appears.",
-          "Invoice list appears.",
-          "Metrics appear.",
-          "Password reset action appears.",
-          "Full create-order action opens order screen with customer preselected.",
-          "Quick order modal opens from profile.",
-          "Mobile layout is comfortable."
+          "אזורי/טאבי הפרופיל: פרטים, הזמנות, חשבוניות, מדדים ואיפוס סיסמה.",
+          "הפרטים מציגים שם מלא, טלפון, כתובת, עיר והערות משלוח.",
+          "סיכום הזמנות מופיע בפרופיל.",
+          "רשימת חשבוניות מופיעה בפרופיל.",
+          "מדדי לקוח מופיעים בפרופיל.",
+          "פעולת איפוס סיסמה מופיעה בפרופיל.",
+          "פעולת יצירת הזמנה מלאה פותחת מסך הזמנה עם הלקוח כבר מסומן.",
+          "modal הזמנה מהיר נפתח מתוך הפרופיל.",
+          "הפריסה נוחה במובייל."
         ]
       },
       {
-        title: "Order Creation From Customer",
+        title: "יצירת הזמנה מתוך לקוח",
         branch: "feat/customer-screen-order-links",
         items: [
-          "Full order screen path opens with customer preselected.",
-          "Quick order modal can create a basic order from customer profile.",
-          "Customer screen does not duplicate order total logic if order logic already exists elsewhere.",
-          "Delivery notes do not transfer automatically.",
-          "Errors are shown clearly."
+          "מסלול מסך הזמנה מלא נפתח עם הלקוח כבר מסומן.",
+          "modal מהיר יכול ליצור הזמנה בסיסית מתוך פרופיל הלקוח.",
+          "מסך הלקוח לא משכפל לוגיקת סכומי הזמנה אם היא כבר קיימת במקום אחר.",
+          "הערות משלוח לא עוברות אוטומטית.",
+          "שגיאות מוצגות בצורה ברורה."
         ]
       },
       {
-        title: "Password Reset",
+        title: "איפוס סיסמה",
         branch: "feat/customer-screen-password-reset",
         items: [
-          "Reset action exists in customer profile.",
-          "Every employee can use reset action.",
-          "Reset sets temporary password 123456.",
-          "Customer must change password on next login.",
-          "Password hash is updated; plain password is not stored.",
-          "No password is displayed after reset.",
-          "No external message/email/WhatsApp is sent in this scope."
+          "פעולת איפוס קיימת בפרופיל הלקוח.",
+          "כל עובד יכול להשתמש בפעולת האיפוס.",
+          "האיפוס מגדיר סיסמה זמנית 123456.",
+          "הלקוח חייב להחליף סיסמה בכניסה הבאה.",
+          "ה-hash של הסיסמה מתעדכן; סיסמה גלויה לא נשמרת.",
+          "אחרי האיפוס לא מוצגת סיסמה שמורה.",
+          "לא נשלחת הודעה חיצונית, מייל או WhatsApp בשלב הזה."
         ]
       },
       {
-        title: "Customer Invoices",
+        title: "חשבוניות לקוח",
         branch: "feat/customer-screen-invoices",
         items: [
-          "Customer profile shows invoices.",
-          "Invoice fields: link, invoice number, date, amount, payment status.",
-          "Meshulam / Grow is treated as future expected source.",
-          "Exact provider integration is deferred.",
-          "Customer screen does not issue official invoices.",
-          "Empty state is clear."
+          "פרופיל הלקוח מציג חשבוניות.",
+          "שדות החשבונית: קישור, מספר חשבונית, תאריך, סכום וסטטוס תשלום.",
+          "Meshulam / Grow מסומן כמקור עתידי צפוי.",
+          "פרטי אינטגרציית הספק נדחים לשלב מאוחר יותר.",
+          "מסך הלקוח לא מנפיק חשבוניות רשמיות.",
+          "מצב ריק מוצג בצורה ברורה."
         ]
       },
       {
-        title: "Customer Metrics",
+        title: "מדדי לקוח",
         branch: "feat/customer-screen-metrics",
         items: [
-          "Profile shows total purchases.",
-          "Profile shows number of orders.",
-          "Profile shows average order value.",
-          "Profile shows last order date.",
-          "Metrics derive from persisted orders/payments.",
-          "Common/frequent products are not shown."
+          "הפרופיל מציג סך רכישות כולל.",
+          "הפרופיל מציג מספר הזמנות.",
+          "הפרופיל מציג ממוצע להזמנה.",
+          "הפרופיל מציג תאריך הזמנה אחרונה.",
+          "המדדים נגזרים מנתוני הזמנות/תשלומים שמורים.",
+          "מוצרים קבועים/נפוצים לא מוצגים בשלב הזה."
         ]
       },
       {
-        title: "Responsive Mobile QA",
+        title: "בדיקת מובייל ו-RTL",
         branch: "fix/customer-screen-mobile-rtl",
         items: [
-          "Customer list is comfortable on phone.",
-          "Customer profile is comfortable on phone.",
-          "Create/edit form is comfortable on phone.",
-          "Quick order modal is comfortable on phone.",
-          "Deleted customers page is comfortable on phone.",
-          "Hebrew RTL layout is correct.",
-          "Long names, addresses, invoice links, and notes do not overflow.",
-          "Main actions remain reachable."
+          "רשימת הלקוחות נוחה בטלפון.",
+          "פרופיל הלקוח נוח בטלפון.",
+          "טופס יצירה/עריכה נוח בטלפון.",
+          "modal הזמנה מהיר נוח בטלפון.",
+          "דף לקוחות מחוקים נוח בטלפון.",
+          "פריסת RTL בעברית תקינה.",
+          "שמות ארוכים, כתובות, קישורי חשבוניות והערות לא גולשים מחוץ למסך.",
+          "הפעולות המרכזיות נשארות נגישות."
         ]
       }
     ];
@@ -442,7 +442,7 @@
             <h3>${index + 1}. ${task.title}</h3>
             <span class="branch">${task.branch}</span>
           </div>
-          <span class="status">pending</span>
+          <span class="status">ממתין</span>
         </div>
         <div class="body">
           <ul class="acceptance">
