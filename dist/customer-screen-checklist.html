@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drive Dog | צ'קליסט מסך לקוחות</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f5ef;
+      --surface: #ffffff;
+      --ink: #202124;
+      --muted: #62656a;
+      --line: #dad7ce;
+      --accent: #1f7a5c;
+      --accent-soft: #e5f3ee;
+      --warn: #9b5c00;
+      --warn-soft: #fff2d7;
+      --shadow: 0 16px 42px rgba(32, 33, 36, 0.08);
+      font-family: "Inter", "Noto Sans Hebrew", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    header {
+      background: #173d33;
+      color: #fff;
+      padding: 28px 20px;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      max-width: 780px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 17px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    main {
+      padding: 22px 0 42px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 24px;
+    }
+
+    .decisions {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 18px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .decision-grid li {
+      color: var(--muted);
+      border-bottom: 1px solid #eeeae2;
+      padding: 7px 0;
+    }
+
+    .decision-grid strong {
+      color: var(--ink);
+    }
+
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin: 12px 0;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfaf7;
+    }
+
+    .section-title {
+      min-width: 0;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .branch {
+      display: inline-block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      direction: ltr;
+      unicode-bidi: plaintext;
+    }
+
+    .status {
+      border: 1px solid #d6bb78;
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .body {
+      padding: 14px 16px 16px;
+    }
+
+    .acceptance {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .acceptance li {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 9px;
+      align-items: start;
+      color: #34363a;
+    }
+
+    .box {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      background: var(--accent-soft);
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 4px 0 30px;
+    }
+
+    @media (max-width: 760px) {
+      .summary,
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topline,
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .status {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="topline">
+        <div>
+          <h1>צ'קליסט מסך לקוחות</h1>
+          <p class="subtitle">Drive Dog — גרסת מעקב זמנית לשלב האיפיון לפני מימוש.</p>
+        </div>
+        <span class="badge">עודכן: 24.07.2026</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="summary" aria-label="סיכום">
+      <div class="metric"><span>יחידות עבודה</span><strong>11</strong></div>
+      <div class="metric"><span>סטטוס</span><strong>Pending</strong></div>
+      <div class="metric"><span>מקור אמת</span><strong>DB</strong></div>
+      <div class="metric"><span>מובייל</span><strong>חובה</strong></div>
+    </section>
+
+    <section class="decisions">
+      <h2>החלטות סגורות</h2>
+      <ul class="decision-grid">
+        <li><strong>משתמשים:</strong> בעל העסק והעובדים</li>
+        <li><strong>לקוח נוצר:</strong> ברגע שבעל העסק יוצר אותו</li>
+        <li><strong>טלפון:</strong> מזהה ייחודי</li>
+        <li><strong>שדות חובה:</strong> שם, שם משפחה, טלפון, כתובת, עיר, הערות משלוח</li>
+        <li><strong>מחיקה:</strong> מותרת, נשמרת בדף לקוחות מחוקים</li>
+        <li><strong>איפוס סיסמה:</strong> 123456 וחובה שינוי בכניסה הבאה</li>
+        <li><strong>חשבוניות:</strong> קישור, מספר, תאריך, סכום, סטטוס תשלום</li>
+        <li><strong>מדדים:</strong> סך רכישות, מספר הזמנות, ממוצע, הזמנה אחרונה</li>
+        <li><strong>הזמנה מתוך לקוח:</strong> מסך מלא וגם modal מהיר</li>
+        <li><strong>ייבוא:</strong> אין Excel/CSV בשלב הזה, יהיו לקוחות דמה לבדיקות</li>
+        <li><strong>הערות משלוח:</strong> לא עוברות אוטומטית להזמנה</li>
+        <li><strong>הרשאות:</strong> כל עובד יכול לערוך, למחוק ולאפס סיסמה</li>
+      </ul>
+    </section>
+
+    <div id="checklist"></div>
+  </main>
+
+  <footer class="wrap">
+    מקור: docs/agent-harness/CUSTOMER_SCREEN_IMPLEMENTATION_CHECKLIST.md
+  </footer>
+
+  <script>
+    const tasks = [
+      {
+        title: "Current Screen Audit",
+        branch: "docs/customer-screen-audit",
+        items: [
+          "Current static customer behavior is documented.",
+          "Current list columns, form fields, and actions are documented.",
+          "Demo-only localStorage behavior is documented.",
+          "Gaps to backend / DB implementation are listed.",
+          "No product behavior is changed."
+        ]
+      },
+      {
+        title: "Customer Data Model",
+        branch: "feat/customer-screen-data-model",
+        items: [
+          "Customer records persist in backend / DB.",
+          "Hard refresh does not lose customer changes.",
+          "Fields exist for customer details, password setup, must-change-password, and deleted timestamp.",
+          "Phone uniqueness is enforced.",
+          "Deleted customers are retained for deleted-customers page/archive.",
+          "Demo customer records exist for tests.",
+          "No Excel/CSV import is built in this scope."
+        ]
+      },
+      {
+        title: "Customer List",
+        branch: "feat/customer-screen-list",
+        items: [
+          "List loads from backend / DB.",
+          "Table columns include full name, phone, city, last order date, order count, total purchases, and actions.",
+          "Search works by full name, address, phone, and city.",
+          "Row actions include open/view, edit, delete.",
+          "Deleted customers are not shown in the main list.",
+          "Empty, loading, and error states exist.",
+          "Mobile table/list is usable without horizontal overflow."
+        ]
+      },
+      {
+        title: "Customer Create / Edit / Delete",
+        branch: "feat/customer-screen-edit-delete",
+        items: [
+          "Owner/employee can create customer.",
+          "Owner/employee can edit first name, last name, phone, address, city, delivery notes.",
+          "Required validation exists for first name, last name, and phone.",
+          "Duplicate phone error is clear.",
+          "Save failure does not show success or mutate state incorrectly.",
+          "Delete requires confirmation.",
+          "Delete moves customer to deleted-customers page/archive.",
+          "Address change updates the customer's orders accordingly.",
+          "Delivery notes do not automatically copy into new orders."
+        ]
+      },
+      {
+        title: "Deleted Customers Page",
+        branch: "feat/customer-screen-deleted-customers",
+        items: [
+          "Separate page/view shows deleted customers.",
+          "Deleted customer includes full name, phone, city, deleted date when available, and open/view action.",
+          "Deleted customers do not appear in active customer selects by default.",
+          "Restoring customer is not required unless explicitly added later.",
+          "Mobile view is usable."
+        ]
+      },
+      {
+        title: "Customer Detail",
+        branch: "feat/customer-screen-detail",
+        items: [
+          "Profile areas/tabs: details, orders, invoices, metrics, password reset.",
+          "Details show full name, phone, address, city, delivery notes.",
+          "Orders summary appears.",
+          "Invoice list appears.",
+          "Metrics appear.",
+          "Password reset action appears.",
+          "Full create-order action opens order screen with customer preselected.",
+          "Quick order modal opens from profile.",
+          "Mobile layout is comfortable."
+        ]
+      },
+      {
+        title: "Order Creation From Customer",
+        branch: "feat/customer-screen-order-links",
+        items: [
+          "Full order screen path opens with customer preselected.",
+          "Quick order modal can create a basic order from customer profile.",
+          "Customer screen does not duplicate order total logic if order logic already exists elsewhere.",
+          "Delivery notes do not transfer automatically.",
+          "Errors are shown clearly."
+        ]
+      },
+      {
+        title: "Password Reset",
+        branch: "feat/customer-screen-password-reset",
+        items: [
+          "Reset action exists in customer profile.",
+          "Every employee can use reset action.",
+          "Reset sets temporary password 123456.",
+          "Customer must change password on next login.",
+          "Password hash is updated; plain password is not stored.",
+          "No password is displayed after reset.",
+          "No external message/email/WhatsApp is sent in this scope."
+        ]
+      },
+      {
+        title: "Customer Invoices",
+        branch: "feat/customer-screen-invoices",
+        items: [
+          "Customer profile shows invoices.",
+          "Invoice fields: link, invoice number, date, amount, payment status.",
+          "Meshulam / Grow is treated as future expected source.",
+          "Exact provider integration is deferred.",
+          "Customer screen does not issue official invoices.",
+          "Empty state is clear."
+        ]
+      },
+      {
+        title: "Customer Metrics",
+        branch: "feat/customer-screen-metrics",
+        items: [
+          "Profile shows total purchases.",
+          "Profile shows number of orders.",
+          "Profile shows average order value.",
+          "Profile shows last order date.",
+          "Metrics derive from persisted orders/payments.",
+          "Common/frequent products are not shown."
+        ]
+      },
+      {
+        title: "Responsive Mobile QA",
+        branch: "fix/customer-screen-mobile-rtl",
+        items: [
+          "Customer list is comfortable on phone.",
+          "Customer profile is comfortable on phone.",
+          "Create/edit form is comfortable on phone.",
+          "Quick order modal is comfortable on phone.",
+          "Deleted customers page is comfortable on phone.",
+          "Hebrew RTL layout is correct.",
+          "Long names, addresses, invoice links, and notes do not overflow.",
+          "Main actions remain reachable."
+        ]
+      }
+    ];
+
+    const checklist = document.getElementById("checklist");
+
+    tasks.forEach((task, index) => {
+      const section = document.createElement("section");
+      section.className = "section";
+      section.innerHTML = `
+        <div class="section-head">
+          <div class="section-title">
+            <h3>${index + 1}. ${task.title}</h3>
+            <span class="branch">${task.branch}</span>
+          </div>
+          <span class="status">pending</span>
+        </div>
+        <div class="body">
+          <ul class="acceptance">
+            ${task.items.map((item) => `<li><span class="box" aria-hidden="true"></span><span>${item}</span></li>`).join("")}
+          </ul>
+        </div>
+      `;
+      checklist.append(section);
+    });
+  </script>
+</body>
+</html>

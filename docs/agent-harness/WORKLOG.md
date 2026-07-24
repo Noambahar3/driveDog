@@ -81,3 +81,38 @@ changes. Keep entries short and factual.
   localStorage persistence.
 - Grow / Meshulam remains a payment-link stub only. No live charges or external
   API calls are made.
+
+## 2026-07-24
+
+### Customer Screen Workplan Drafted
+
+- Noam shared a preferred screen workflow pattern from the Solar Tzadi sales
+  screen process as a work style example only.
+- Created `CUSTOMER_SCREEN_WORKPLAN.md` for Drive Dog customer-screen
+  readiness: screen boundaries, business rules, section checklist, branch
+  recommendations, and ready prompts for implementation agents.
+- Explicitly marked current `localStorage` behavior as demo-only; real customer
+  records must use backend / DB as source of truth.
+- Questionnaire decisions so far: customer screen is for owner + employees;
+  customer exists once owner creates it; phone is unique; active/inactive has no
+  current business meaning; screen should support editing first/last name,
+  phone, address, city, delivery notes, password reset to a fixed temporary
+  password with forced change, invoice links, customer purchase metrics, and
+  starting a new order; customer history is not required.
+- Noam approved allowing customer deletion from the customer screen.
+- Password reset decision: reset button sets temporary password `123456`, and
+  the customer must change it on next login.
+- Invoice-link direction: likely Meshulam / Grow, but exact implementation is
+  deferred.
+- Final customer-screen questionnaire decisions: no Excel/CSV import in this
+  scope; use demo customers for tests; address edits update the customer's
+  orders; deleted customers are kept on a separate page/archive; customer table
+  columns are full name, phone, city, last order date, order count, total
+  purchases, and actions; search covers name, address, phone, and city; profile
+  areas are details, orders, invoices, metrics, and password reset; create order
+  supports both full screen and quick modal; do not include common/frequent
+  products; delivery notes do not automatically copy into new orders; every
+  employee can edit/delete/reset; mobile responsiveness is required in the
+  first implementation.
+- Created `CUSTOMER_SCREEN_IMPLEMENTATION_CHECKLIST.md` with branch-ready tasks
+  and prompts.

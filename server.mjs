@@ -14,7 +14,9 @@ const routes = new Map([
   ["/proposal", "proposal.html"],
   ["/proposal.html", "proposal.html"],
   ["/questionnaire", "index.html"],
-  ["/questionnaire.html", "index.html"]
+  ["/questionnaire.html", "index.html"],
+  ["/customer-screen-checklist", "customer-screen-checklist.html"],
+  ["/customer-screen-checklist.html", "customer-screen-checklist.html"]
 ]);
 
 const mimeTypes = {
