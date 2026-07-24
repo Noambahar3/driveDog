@@ -2,6 +2,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "test": "node tests/customer-api.test.mjs"
   }
 }

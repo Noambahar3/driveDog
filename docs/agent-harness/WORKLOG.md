@@ -118,3 +118,9 @@ changes. Keep entries short and factual.
   and prompts.
 - Completed the current customer-screen audit in
   `CUSTOMER_SCREEN_CURRENT_AUDIT.md`; no product behavior changed.
+- Implemented the customer data model slice on branch
+  `feat/customer-screen-data-model`: local Node server now exposes a file-backed
+  customer API with demo customers, unique phone validation, soft-delete archive,
+  and password reset to temporary `123456` with forced next-login change.
+- Added `tests/customer-api.test.mjs`; `npm test` covers the customer API
+  persistence and validation flow.

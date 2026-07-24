@@ -74,7 +74,7 @@ Acceptance criteria:
 
 Section: Customer Data Model  
 Branch: `feat/customer-screen-data-model`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -86,6 +86,13 @@ Acceptance:
 - Deleted customers are retained for deleted-customers page/archive.
 - Demo customer records exist for tests.
 - No Excel/CSV import is built in this scope.
+
+Result:
+
+- Completed with file-backed customer API in `server.mjs`.
+- Added `tests/customer-api.test.mjs`.
+- `npm test` covers persistence, duplicate phone validation, password reset
+  safety, and deleted-customer archive behavior.
 
 Prompt:
 
