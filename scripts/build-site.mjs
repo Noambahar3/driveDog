@@ -11,11 +11,13 @@ const adminHtml = ${JSON.stringify(adminHtml)};
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    const html = url.pathname.startsWith("/admin")
+    const html = url.pathname === "/" || url.pathname.startsWith("/admin")
       ? adminHtml
       : url.pathname.startsWith("/proposal")
         ? proposalHtml
-        : questionnaireHtml;
+        : url.pathname.startsWith("/questionnaire")
+          ? questionnaireHtml
+          : adminHtml;
 
     return new Response(html, {
       headers: {
