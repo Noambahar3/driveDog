@@ -116,3 +116,5 @@ changes. Keep entries short and factual.
   first implementation.
 - Created `CUSTOMER_SCREEN_IMPLEMENTATION_CHECKLIST.md` with branch-ready tasks
   and prompts.
+- Completed the current customer-screen audit in
+  `CUSTOMER_SCREEN_CURRENT_AUDIT.md`; no product behavior changed.

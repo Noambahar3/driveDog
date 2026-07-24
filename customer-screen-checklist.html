@@ -188,6 +188,12 @@
       white-space: nowrap;
     }
 
+    .status.done {
+      border-color: #9fd0bf;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
     .body {
       padding: 14px 16px 16px;
     }
@@ -289,7 +295,7 @@
   <main class="wrap">
     <section class="summary" aria-label="סיכום">
       <div class="metric"><span>יחידות עבודה</span><strong>11</strong></div>
-      <div class="metric"><span>סטטוס</span><strong>ממתין</strong></div>
+      <div class="metric"><span>סטטוס</span><strong>1/11 בוצע</strong></div>
       <div class="metric"><span>מקור אמת</span><strong>DB</strong></div>
       <div class="metric"><span>מובייל</span><strong>חובה</strong></div>
     </section>
@@ -324,6 +330,7 @@
       {
         title: "מיפוי המסך הקיים",
         branch: "docs/customer-screen-audit",
+        status: "בוצע",
         items: [
           "ההתנהגות הנוכחית של מסך הלקוחות הסטטי מתועדת.",
           "עמודות הרשימה, שדות הטופס והפעולות הקיימות מתועדים.",
@@ -685,7 +692,7 @@ Acceptance criteria:
             <h3>${index + 1}. ${task.title}</h3>
             <span class="branch">${task.branch}</span>
           </div>
-          <span class="status">ממתין</span>
+          <span class="status ${task.status === "בוצע" ? "done" : ""}">${task.status || "ממתין"}</span>
         </div>
         <div class="body">
           <ul class="acceptance">
