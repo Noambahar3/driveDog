@@ -49,6 +49,11 @@
       grid-template-columns: 250px 1fr;
     }
 
+    .menu-toggle,
+    .sidebar-backdrop {
+      display: none;
+    }
+
     .sidebar {
       position: sticky;
       top: 0;
@@ -68,6 +73,18 @@
       min-height: 44px;
       font-weight: 800;
       font-size: 18px;
+    }
+
+    .sidebar-close {
+      display: none;
+      margin-inline-start: auto;
+      width: 36px;
+      height: 36px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-size: 22px;
+      line-height: 1;
     }
 
     .mark {
@@ -450,14 +467,50 @@
 
     @media (max-width: 960px) {
       .app { grid-template-columns: 1fr; }
-      .sidebar {
-        position: static;
-        height: auto;
+      body.menu-open { overflow: hidden; }
+      .menu-toggle {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        z-index: 31;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: #17211d;
+        color: #ffffff;
+        box-shadow: var(--shadow);
+        font-size: 24px;
+        line-height: 1;
       }
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 29;
+        background: rgba(23, 33, 29, 0.46);
+      }
+      body.menu-open .sidebar-backdrop { display: block; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 30;
+        width: min(82vw, 320px);
+        height: 100dvh;
+        transform: translateX(105%);
+        transition: transform 180ms ease;
+        box-shadow: -16px 0 34px rgba(23, 33, 29, 0.22);
+      }
+      body.menu-open .sidebar { transform: translateX(0); }
+      .sidebar-close { display: grid; place-items: center; }
       nav {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        overflow-y: auto;
       }
       .side-note { display: none; }
+      main { padding-top: 68px; }
       .split,
       .profile-grid,
       .metrics,
@@ -476,8 +529,9 @@
     }
 
     @media (max-width: 620px) {
-      main { padding: 14px; }
-      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      main { padding: 66px 14px 14px; }
+      .topbar { gap: 12px; }
+      h1 { font-size: 22px; }
       .form-grid,
       .detail-list,
       .item-row {
@@ -490,9 +544,11 @@
   </style>
 </head>
 <body>
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="פתיחת תפריט" aria-controls="sidebar" aria-expanded="false">☰</button>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <div class="app">
-    <aside class="sidebar">
-      <div class="brand"><span class="mark">DD</span><span>Drive Dog</span></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="mark">DD</span><span>Drive Dog</span><button class="sidebar-close" id="sidebarClose" type="button" aria-label="סגירת תפריט">×</button></div>
       <nav id="nav"></nav>
       <div class="side-note">MVP פנימי: הדאטה נשמר בדפדפן בלבד. Grow / משולם מסומן כ-stub ולא מחייב בפועל.</div>
     </aside>
@@ -735,12 +791,27 @@
       toast.timer = window.setTimeout(() => node.classList.add('hidden'), 2400);
     }
 
+    function setMenuOpen(open) {
+      document.body.classList.toggle('menu-open', open);
+      document.getElementById('menuToggle').setAttribute('aria-expanded', String(open));
+    }
+
+    function bindShell() {
+      document.getElementById('menuToggle').addEventListener('click', () => setMenuOpen(!document.body.classList.contains('menu-open')));
+      document.getElementById('sidebarClose').addEventListener('click', () => setMenuOpen(false));
+      document.getElementById('sidebarBackdrop').addEventListener('click', () => setMenuOpen(false));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') setMenuOpen(false);
+      });
+    }
+
     function renderNav() {
       const nav = document.getElementById('nav');
       nav.innerHTML = tabs.map(([id, label]) => `<button class="nav-button ${id === currentTab ? 'active' : ''}" data-tab="${id}" type="button">${label}</button>`).join('');
       nav.querySelectorAll('button').forEach((button) => {
         button.addEventListener('click', () => {
           currentTab = button.dataset.tab;
+          setMenuOpen(false);
           if (currentTab === 'deletedCustomers' && deletedCustomersLoadState === 'idle') loadDeletedCustomersFromServer();
           render();
         });
@@ -1540,6 +1611,7 @@
       saveState('הדמו אופס');
     });
 
+    bindShell();
     render();
     loadCustomersFromServer();
   </script>
