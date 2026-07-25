@@ -16,25 +16,85 @@ const adminHtml = ${JSON.stringify(adminHtml)};
 const customerScreenChecklistHtml = ${JSON.stringify(customerScreenChecklistHtml)};
 const demoApiCustomers = ${JSON.stringify(demoApiCustomers)};
 
+function json(body, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
+    }
+  });
+}
+
+function normalizePhone(phone) {
+  return String(phone ?? "").replace(/[^\\d+]/g, "");
+}
+
+function normalizeCustomerInput(input, existing = {}) {
+  return {
+    firstName: String(input.firstName ?? existing.firstName ?? "").trim(),
+    lastName: String(input.lastName ?? existing.lastName ?? "").trim(),
+    phone: String(input.phone ?? existing.phone ?? "").trim(),
+    address: String(input.address ?? existing.address ?? "").trim(),
+    city: String(input.city ?? existing.city ?? "").trim(),
+    deliveryNotes: String(input.deliveryNotes ?? existing.deliveryNotes ?? "").trim()
+  };
+}
+
+function validateCustomerInput(input) {
+  if (!input.firstName) return "נדרש שם";
+  if (!input.lastName) return "נדרש שם משפחה";
+  if (!input.phone) return "נדרש טלפון";
+  return null;
+}
+
+function ensureUniquePhone(customers, phone, customerId) {
+  const normalized = normalizePhone(phone);
+  return !customers.some((customer) => customer.id !== customerId && normalizePhone(customer.phone) === normalized);
+}
+
+async function handleCustomerApi(request, url) {
+  const match = url.pathname.match(/^\\/api\\/customers(?:\\/([^/]+))?$/);
+  if (!match) return null;
+  const [, customerId] = match;
+  if (request.method === "GET" && !customerId) {
+    return json({ customers: demoApiCustomers.filter((customer) => !customer.deletedAt) });
+  }
+  if (request.method === "GET" && customerId === "deleted") {
+    return json({ customers: demoApiCustomers.filter((customer) => customer.deletedAt) });
+  }
+  if (request.method === "POST" && !customerId) {
+    const input = normalizeCustomerInput(await request.json());
+    const validationError = validateCustomerInput(input);
+    if (validationError) return json({ error: validationError }, 400);
+    if (!ensureUniquePhone(demoApiCustomers, input.phone)) return json({ error: "כבר קיים לקוח עם הטלפון הזה" }, 409);
+    const now = new Date().toISOString();
+    const customer = { id: "c_" + Date.now().toString(36), ...input, mustChangePassword: false, deletedAt: null, createdAt: now, updatedAt: now };
+    demoApiCustomers.push(customer);
+    return json({ customer }, 201);
+  }
+  const customer = demoApiCustomers.find((item) => item.id === customerId);
+  if (!customer) return json({ error: "לקוח לא נמצא" }, 404);
+  if (request.method === "PATCH") {
+    const input = normalizeCustomerInput(await request.json(), customer);
+    const validationError = validateCustomerInput(input);
+    if (validationError) return json({ error: validationError }, 400);
+    if (!ensureUniquePhone(demoApiCustomers, input.phone, customer.id)) return json({ error: "כבר קיים לקוח עם הטלפון הזה" }, 409);
+    Object.assign(customer, input, { updatedAt: new Date().toISOString() });
+    return json({ customer });
+  }
+  if (request.method === "DELETE") {
+    Object.assign(customer, { deletedAt: customer.deletedAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+    return json({ customer });
+  }
+  return json({ error: "פעולה לא נתמכת" }, 405);
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/api/customers") {
-      return new Response(JSON.stringify({ customers: demoApiCustomers }), {
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          "cache-control": "no-store"
-        }
-      });
-    }
-    if (request.method === "GET" && url.pathname === "/api/customers/deleted") {
-      return new Response(JSON.stringify({ customers: [] }), {
-        headers: {
-          "content-type": "application/json; charset=utf-8",
-          "cache-control": "no-store"
-        }
-      });
-    }
+    const apiResponse = await handleCustomerApi(request, url);
+    if (apiResponse) return apiResponse;
     const html = url.pathname === "/" || url.pathname.startsWith("/admin")
       ? adminHtml
       : url.pathname.startsWith("/proposal")

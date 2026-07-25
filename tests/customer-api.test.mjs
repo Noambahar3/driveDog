@@ -63,6 +63,31 @@ try {
   assert.equal(created.body.customer.firstName, "נועה");
   assert.equal(created.body.customer.lastName, "ישראלי");
 
+  const edited = await request(`/api/customers/${created.body.customer.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      firstName: "נועה",
+      lastName: "מעודכנת",
+      phone: "050-9999999",
+      address: "הרצל 11",
+      city: "נתיבות",
+      deliveryNotes: "לא להעתיק להזמנות חדשות"
+    })
+  });
+  assert.equal(edited.response.status, 200);
+  assert.equal(edited.body.customer.lastName, "מעודכנת");
+  assert.equal(edited.body.customer.address, "הרצל 11");
+
+  const invalidEdit = await request(`/api/customers/${created.body.customer.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      firstName: "",
+      lastName: "מעודכנת",
+      phone: "050-9999999"
+    })
+  });
+  assert.equal(invalidEdit.response.status, 400);
+
   const refreshed = await request("/api/customers");
   assert.equal(refreshed.response.status, 200);
   assert.ok(refreshed.body.customers.some((customer) => customer.phone === "050-9999999"));
@@ -79,6 +104,19 @@ try {
   });
   assert.equal(duplicate.response.status, 409);
   assert.match(duplicate.body.error, /טלפון/);
+
+  const duplicateEdit = await request(`/api/customers/${created.body.customer.id}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      firstName: "נועה",
+      lastName: "מעודכנת",
+      phone: "050-1111111",
+      address: "הרצל 11",
+      city: "נתיבות"
+    })
+  });
+  assert.equal(duplicateEdit.response.status, 409);
+  assert.match(duplicateEdit.body.error, /טלפון/);
 
   const reset = await request(`/api/customers/${created.body.customer.id}/reset-password`, { method: "POST" });
   assert.equal(reset.response.status, 200);

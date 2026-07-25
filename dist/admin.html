@@ -299,6 +299,11 @@
       font-size: 12px;
     }
 
+    .mini.danger {
+      background: #fde8e6;
+      color: var(--danger);
+    }
+
     .status {
       display: inline-flex;
       align-items: center;
@@ -491,6 +496,7 @@
     let currentTab = 'dashboard';
     let customersLoadState = 'loading';
     let customersLoadError = '';
+    let customersSaving = false;
 
     function clone(value) {
       return JSON.parse(JSON.stringify(value));
@@ -527,6 +533,19 @@
         customersLoadError = error.message || 'טעינת הלקוחות נכשלה';
       }
       render();
+    }
+
+    async function customerApi(path, options = {}) {
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          'content-type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'פעולת הלקוח נכשלה');
+      return data;
     }
 
     function normalizeCustomer(item) {
@@ -686,15 +705,13 @@
           <form class="panel form-grid" id="customerForm">
             <div class="field full"><h2>לקוח חדש / עריכה</h2></div>
             ${hiddenId('customerId')}
-            ${field('שם', 'customerName')}
-            ${field('טלפון', 'customerPhone')}
+            ${field('שם פרטי', 'customerFirstName')}
+            ${field('שם משפחה', 'customerLastName')}
+            ${field('טלפון', 'customerPhone', 'tel')}
             ${field('כתובת', 'customerAddress')}
             ${field('עיר', 'customerCity')}
-            ${field('אזור', 'customerArea')}
-            <div class="field"><label>פעיל</label><select id="customerActive"><option value="true">כן</option><option value="false">לא</option></select></div>
             ${area('הערות משלוח', 'customerDeliveryNotes')}
-            ${area('הערות פנימיות', 'customerInternalNotes')}
-            <div class="field full toolbar"><button class="button primary" type="submit">שמירה</button><button class="button ghost" id="clearCustomer" type="button">ניקוי</button></div>
+            <div class="field full toolbar"><button class="button primary" id="saveCustomer" type="submit">שמירה</button><button class="button ghost" id="clearCustomer" type="button">ניקוי</button></div>
           </form>
         </div>`;
     }
@@ -719,7 +736,7 @@
           <td>${metrics.lastOrderDate || '-'}</td>
           <td>${metrics.orderCount}</td>
           <td><strong>${shekel(metrics.total)}</strong></td>
-          <td><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button></div></td>
+          <td><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button><button class="mini danger" data-delete-customer="${item.id}" type="button">מחיקה</button></div></td>
         </tr>`;
       }).join('')}</tbody></table>`;
     }
@@ -920,44 +937,83 @@
         bindCustomerRows();
       });
       bindCustomerRows();
-      document.getElementById('clearCustomer').addEventListener('click', () => form.reset());
-      form.addEventListener('submit', (event) => {
+      document.getElementById('clearCustomer').addEventListener('click', () => {
+        form.reset();
+        setValue('customerId', '');
+      });
+      form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const id = document.getElementById('customerId').value || nextId('c', state.customers);
+        const id = document.getElementById('customerId').value;
         const item = {
-          id,
-          name: value('customerName'),
+          firstName: value('customerFirstName'),
+          lastName: value('customerLastName'),
           phone: value('customerPhone'),
           address: value('customerAddress'),
           city: value('customerCity'),
-          area: value('customerArea'),
-          deliveryNotes: value('customerDeliveryNotes'),
-          internalNotes: value('customerInternalNotes'),
-          active: value('customerActive') === 'true'
+          deliveryNotes: value('customerDeliveryNotes')
         };
-        if (!item.name || !item.phone) return toast('צריך שם וטלפון ללקוח');
-        upsert(state.customers, item);
-        saveState('לקוח נשמר');
+        if (!item.firstName || !item.lastName || !item.phone) return toast('צריך שם פרטי, שם משפחה וטלפון');
+        const saveButton = document.getElementById('saveCustomer');
+        customersSaving = true;
+        saveButton.disabled = true;
+        saveButton.textContent = 'שומר...';
+        try {
+          const data = await customerApi(id ? `/api/customers/${encodeURIComponent(id)}` : '/api/customers', {
+            method: id ? 'PATCH' : 'POST',
+            body: JSON.stringify(item)
+          });
+          const savedCustomer = normalizeCustomer(data.customer);
+          upsert(state.customers, savedCustomer);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          form.reset();
+          setValue('customerId', '');
+          toast('לקוח נשמר');
+          render();
+        } catch (error) {
+          toast(error.message || 'שמירת הלקוח נכשלה');
+        } finally {
+          customersSaving = false;
+          if (document.body.contains(saveButton)) {
+            saveButton.disabled = false;
+            saveButton.textContent = 'שמירה';
+          }
+        }
       });
     }
 
     function bindCustomerRows() {
       document.querySelectorAll('[data-edit-customer]').forEach((button) => button.addEventListener('click', () => fillCustomer(button.dataset.editCustomer)));
       document.querySelectorAll('[data-order-customer]').forEach((button) => button.addEventListener('click', () => { state.selected.customerId = button.dataset.orderCustomer; currentTab = 'orders'; render(); }));
+      document.querySelectorAll('[data-delete-customer]').forEach((button) => button.addEventListener('click', () => deleteCustomer(button.dataset.deleteCustomer)));
     }
 
     function fillCustomer(id) {
       const item = customer(id);
       if (!item) return;
       setValue('customerId', item.id);
-      setValue('customerName', item.name);
+      setValue('customerFirstName', item.firstName);
+      setValue('customerLastName', item.lastName);
       setValue('customerPhone', item.phone);
       setValue('customerAddress', item.address);
       setValue('customerCity', item.city);
-      setValue('customerArea', item.area);
       setValue('customerDeliveryNotes', item.deliveryNotes);
-      setValue('customerInternalNotes', item.internalNotes);
-      setValue('customerActive', String(item.active));
+    }
+
+    async function deleteCustomer(id) {
+      const item = customer(id);
+      if (!item) return;
+      if (!confirm(`למחוק את ${customerName(item)} ולהעביר לארכיון לקוחות מחוקים?`)) return;
+      try {
+        await customerApi(`/api/customers/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        state.customers = state.customers.filter((customerItem) => customerItem.id !== id);
+        state.prices = state.prices.filter((price) => price.customerId !== id);
+        if (state.selected.customerId === id) state.selected.customerId = state.customers[0]?.id || '';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        toast('הלקוח הועבר לארכיון');
+        render();
+      } catch (error) {
+        toast(error.message || 'מחיקת הלקוח נכשלה');
+      }
     }
 
     function bindProducts() {

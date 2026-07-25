@@ -129,3 +129,16 @@ changes. Keep entries short and factual.
   columns, calculates last order/order count/total purchases from existing
   orders, searches by full name/address/phone/city, and has loading/empty/error
   states.
+
+## 2026-07-25
+
+### Customer Create/Edit/Delete Started
+
+- Opened branch `feat/customer-screen-edit-delete`.
+- Connected the customer form in `admin.html` to the customer API for create
+  and edit instead of mutating UI state optimistically.
+- Added customer row deletion with confirmation; successful deletes soft-delete
+  through the API and remove the customer from the active list, while failures
+  keep the customer visible.
+- Updated API tests to cover customer edit, edit validation, and duplicate
+  phone errors during edit.
