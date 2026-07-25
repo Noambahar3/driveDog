@@ -7,18 +7,21 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f6f5;
-      --panel: #ffffff;
-      --panel-2: #f9faf9;
-      --ink: #17211d;
-      --muted: #66736d;
-      --line: #dce3df;
-      --brand: #27745c;
-      --brand-dark: #1f5f4b;
-      --warn: #a15c09;
-      --danger: #b42318;
-      --ok: #197a45;
-      --shadow: 0 12px 30px rgba(33, 43, 38, 0.08);
+      --bg: #fff7ed;
+      --panel: #fffdfa;
+      --panel-2: #fff1dc;
+      --ink: #351704;
+      --muted: #76583d;
+      --line: #ead6bc;
+      --brand: #f49b25;
+      --brand-dark: #7a3507;
+      --brand-ink: #4f2306;
+      --brand-soft: #ffe0ac;
+      --sidebar: #592700;
+      --warn: #a95f00;
+      --danger: #a83220;
+      --ok: #3f7b35;
+      --shadow: 0 12px 30px rgba(89, 39, 0, 0.10);
     }
 
     * { box-sizing: border-box; }
@@ -26,7 +29,8 @@
     body {
       margin: 0;
       font-family: Arial, "Helvetica Neue", sans-serif;
-      background: var(--bg);
+      background:
+        linear-gradient(180deg, #fff7ed 0%, #f9eddd 100%);
       color: var(--ink);
       line-height: 1.45;
     }
@@ -59,7 +63,7 @@
       top: 0;
       height: 100vh;
       padding: 18px;
-      background: #17211d;
+      background: var(--sidebar);
       color: #ffffff;
       display: flex;
       flex-direction: column;
@@ -73,6 +77,7 @@
       min-height: 44px;
       font-weight: 800;
       font-size: 18px;
+      color: #ffe4bb;
     }
 
     .sidebar-close {
@@ -91,11 +96,37 @@
       width: 36px;
       height: 36px;
       border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: #d9f2e8;
-      color: #17211d;
-      font-weight: 900;
+      position: relative;
+      flex: 0 0 auto;
+      background: var(--brand);
+      box-shadow: inset 0 -3px 0 rgba(53, 23, 4, 0.18);
+    }
+
+    .mark span,
+    .mark i {
+      position: absolute;
+      display: block;
+      background: #fff7ed;
+    }
+
+    .mark span {
+      width: 7px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .mark span:nth-child(1) { top: 8px; right: 8px; }
+    .mark span:nth-child(2) { top: 5px; right: 15px; }
+    .mark span:nth-child(3) { top: 8px; right: 22px; }
+    .mark span:nth-child(4) { top: 15px; right: 25px; }
+
+    .mark i {
+      width: 15px;
+      height: 13px;
+      right: 11px;
+      bottom: 7px;
+      border-radius: 50% 50% 45% 45%;
+      transform: rotate(-12deg);
     }
 
     nav {
@@ -108,22 +139,24 @@
       padding: 10px 12px;
       border-radius: 7px;
       text-align: right;
-      color: rgba(255, 255, 255, 0.78);
+      color: rgba(255, 244, 229, 0.78);
       background: transparent;
+      border: 1px solid transparent;
     }
 
     .nav-button.active,
     .nav-button:hover {
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(244, 155, 37, 0.22);
+      border-color: rgba(255, 224, 172, 0.22);
     }
 
     .side-note {
       margin-top: auto;
       padding: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 224, 172, 0.22);
       border-radius: 8px;
-      color: rgba(255, 255, 255, 0.72);
+      color: rgba(255, 244, 229, 0.76);
       font-size: 13px;
     }
 
@@ -163,7 +196,7 @@
       min-height: 38px;
       padding: 9px 12px;
       border-radius: 7px;
-      background: #e5ece8;
+      background: var(--brand-soft);
       color: var(--ink);
       font-weight: 700;
       white-space: nowrap;
@@ -171,12 +204,21 @@
 
     .button.primary {
       background: var(--brand);
-      color: #ffffff;
+      color: var(--brand-ink);
+      box-shadow: inset 0 -2px 0 rgba(53, 23, 4, 0.16);
     }
 
-    .button.primary:hover { background: var(--brand-dark); }
+    .button.primary:hover {
+      background: var(--brand-dark);
+      color: #ffffff;
+    }
     .button.danger { color: #ffffff; background: var(--danger); }
     .button.ghost { background: transparent; border: 1px solid var(--line); }
+    .button.ghost:hover,
+    .mini:hover {
+      border-color: #d69b59;
+      background: #fff1dc;
+    }
 
     .grid {
       display: grid;
@@ -258,11 +300,23 @@
     select,
     textarea {
       width: 100%;
-      border: 1px solid #ccd7d1;
+      border: 1px solid #dfc6aa;
       border-radius: 7px;
       padding: 9px 10px;
       background: #ffffff;
       color: var(--ink);
+    }
+
+    a {
+      color: #8a3f08;
+      font-weight: 700;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 3px solid rgba(244, 155, 37, 0.22);
+      border-color: #d87510;
     }
 
     textarea {
@@ -310,7 +364,8 @@
       min-height: 30px;
       padding: 6px 9px;
       border-radius: 6px;
-      background: #edf2ef;
+      border: 1px solid transparent;
+      background: #fff1dc;
       color: var(--ink);
       font-weight: 700;
       font-size: 12px;
@@ -327,15 +382,15 @@
       min-height: 26px;
       padding: 4px 8px;
       border-radius: 999px;
-      background: #edf2ef;
+      background: #fff1dc;
       color: var(--muted);
       font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .status.ok { background: #e3f4ea; color: var(--ok); }
-    .status.warn { background: #fff3df; color: var(--warn); }
+    .status.ok { background: #e9f4df; color: var(--ok); }
+    .status.warn { background: #ffe4b6; color: var(--warn); }
     .status.danger { background: #fde8e6; color: var(--danger); }
 
     .filters {
@@ -376,13 +431,13 @@
       padding: 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #ffffff;
+      background: #fffdfa;
       overflow-wrap: anywhere;
     }
 
     .delivery-card.cash {
-      border-color: #efc06b;
-      background: #fffaf0;
+      border-color: #eca041;
+      background: #fff1dc;
     }
 
     .muted { color: var(--muted); }
@@ -429,7 +484,7 @@
       display: grid;
       place-items: center;
       padding: 18px;
-      background: rgba(23, 33, 29, 0.48);
+      background: rgba(53, 23, 4, 0.48);
       z-index: 20;
     }
 
@@ -459,7 +514,7 @@
       max-width: min(420px, calc(100% - 36px));
       padding: 12px 14px;
       border-radius: 8px;
-      background: #17211d;
+      background: var(--sidebar);
       color: #ffffff;
       box-shadow: var(--shadow);
       z-index: 10;
@@ -478,8 +533,8 @@
         width: 44px;
         height: 44px;
         border-radius: 8px;
-        background: #17211d;
-        color: #ffffff;
+        background: var(--brand);
+        color: var(--brand-ink);
         box-shadow: var(--shadow);
         font-size: 24px;
         line-height: 1;
@@ -488,7 +543,7 @@
         position: fixed;
         inset: 0;
         z-index: 29;
-        background: rgba(23, 33, 29, 0.46);
+        background: rgba(53, 23, 4, 0.46);
       }
       body.menu-open .sidebar-backdrop { display: block; }
       .sidebar {
@@ -501,7 +556,7 @@
         height: 100dvh;
         transform: translateX(105%);
         transition: transform 180ms ease;
-        box-shadow: -16px 0 34px rgba(23, 33, 29, 0.22);
+        box-shadow: -16px 0 34px rgba(53, 23, 4, 0.24);
       }
       body.menu-open .sidebar { transform: translateX(0); }
       .sidebar-close { display: grid; place-items: center; }
@@ -548,7 +603,7 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <div class="app">
     <aside class="sidebar" id="sidebar">
-      <div class="brand"><span class="mark">DD</span><span>Drive Dog</span><button class="sidebar-close" id="sidebarClose" type="button" aria-label="סגירת תפריט">×</button></div>
+      <div class="brand"><span class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></span><span>Drive Dog</span><button class="sidebar-close" id="sidebarClose" type="button" aria-label="סגירת תפריט">×</button></div>
       <nav id="nav"></nav>
       <div class="side-note">MVP פנימי: הדאטה נשמר בדפדפן בלבד. Grow / משולם מסומן כ-stub ולא מחייב בפועל.</div>
     </aside>
