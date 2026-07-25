@@ -645,10 +645,6 @@
             <p id="pageSubtitle" class="subtitle">תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.</p>
           </div>
         </div>
-        <div class="toolbar">
-          <button class="button ghost" id="exportBtn" type="button">ייצוא JSON</button>
-          <button class="button ghost" id="resetBtn" type="button">איפוס דמו</button>
-        </div>
       </div>
       <section id="view"></section>
     </main>
@@ -1681,22 +1677,6 @@
       if (index >= 0) list[index] = item;
       else list.push(item);
     }
-
-    document.getElementById('exportBtn').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `drive-dog-demo-${today()}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (!confirm('לאפס את נתוני הדמו בדפדפן?')) return;
-      state = clone(seed);
-      saveState('הדמו אופס');
-    });
 
     bindShell();
     render();
