@@ -54,13 +54,13 @@ function ensureUniquePhone(customers, phone, customerId) {
 }
 
 async function handleCustomerApi(request, url) {
-  const match = url.pathname.match(/^\\/api\\/customers(?:\\/([^/]+))?$/);
+  const match = url.pathname.match(/^\\/api\\/customers(?:\\/([^/]+))?(?:\\/([^/]+))?$/);
   if (!match) return null;
-  const [, customerId] = match;
+  const [, customerId, action] = match;
   if (request.method === "GET" && !customerId) {
     return json({ customers: demoApiCustomers.filter((customer) => !customer.deletedAt) });
   }
-  if (request.method === "GET" && customerId === "deleted") {
+  if (request.method === "GET" && customerId === "deleted" && !action) {
     return json({ customers: demoApiCustomers.filter((customer) => customer.deletedAt) });
   }
   if (request.method === "POST" && !customerId) {
@@ -75,7 +75,7 @@ async function handleCustomerApi(request, url) {
   }
   const customer = demoApiCustomers.find((item) => item.id === customerId);
   if (!customer) return json({ error: "לקוח לא נמצא" }, 404);
-  if (request.method === "PATCH") {
+  if (request.method === "PATCH" && !action) {
     const input = normalizeCustomerInput(await request.json(), customer);
     const validationError = validateCustomerInput(input);
     if (validationError) return json({ error: validationError }, 400);
@@ -83,8 +83,12 @@ async function handleCustomerApi(request, url) {
     Object.assign(customer, input, { updatedAt: new Date().toISOString() });
     return json({ customer });
   }
-  if (request.method === "DELETE") {
+  if (request.method === "DELETE" && !action) {
     Object.assign(customer, { deletedAt: customer.deletedAt || new Date().toISOString(), updatedAt: new Date().toISOString() });
+    return json({ customer });
+  }
+  if (request.method === "POST" && action === "reset-password") {
+    Object.assign(customer, { mustChangePassword: true, updatedAt: new Date().toISOString() });
     return json({ customer });
   }
   return json({ error: "פעולה לא נתמכת" }, 405);

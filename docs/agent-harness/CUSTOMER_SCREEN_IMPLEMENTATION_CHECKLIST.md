@@ -169,7 +169,7 @@ Acceptance criteria:
 
 Section: Customer Create/Edit/Delete  
 Branch: `feat/customer-screen-edit-delete`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -184,6 +184,14 @@ Acceptance:
 - Delete failure leaves customer visible.
 - Address change updates the customer's orders accordingly.
 - Delivery notes do not automatically copy into new orders.
+
+Result:
+
+- Completed in `admin.html` and `server.mjs`.
+- Customer form now saves through `/api/customers` with clear Hebrew
+  validation and duplicate phone errors.
+- Delete requires confirmation and uses soft delete through the customer API.
+- Failed save/delete actions leave existing UI state intact.
 
 Prompt:
 
@@ -213,7 +221,7 @@ Acceptance criteria:
 
 Section: Deleted Customers  
 Branch: `feat/customer-screen-deleted-customers`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -223,6 +231,12 @@ Acceptance:
 - Deleted customers do not appear in active customer selects by default.
 - Restoring customer is not required unless explicitly added later.
 - Mobile view is usable.
+
+Result:
+
+- Completed in `admin.html`.
+- Added a deleted-customers archive view backed by `/api/customers/deleted`.
+- Deleted customers are excluded from active customer selects.
 
 Prompt:
 
@@ -248,7 +262,7 @@ Acceptance criteria:
 
 Section: Customer Detail  
 Branch: `feat/customer-screen-detail`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -262,6 +276,12 @@ Acceptance:
 - Quick order modal opens from profile.
 - Empty states are clear.
 - Mobile layout is comfortable.
+
+Result:
+
+- Completed in `admin.html`.
+- Added customer profile with details, related orders, invoices, pricing rules,
+  metrics, password reset, full order action, and quick order modal.
 
 Prompt:
 
@@ -290,7 +310,7 @@ Acceptance criteria:
 
 Section: Customer Order Links  
 Branch: `feat/customer-screen-order-links`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -300,6 +320,13 @@ Acceptance:
   exists elsewhere.
 - Delivery notes do not transfer automatically.
 - Errors are shown clearly.
+
+Result:
+
+- Completed in `admin.html`.
+- Full order flow opens with the customer preselected.
+- Quick order modal creates a basic manual order for the selected customer.
+- Add-price flow opens with the customer preselected.
 
 Prompt:
 
@@ -326,7 +353,7 @@ Acceptance criteria:
 
 Section: Password Reset  
 Branch: `feat/customer-screen-password-reset`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -337,6 +364,13 @@ Acceptance:
 - Password hash is updated; plain password is not stored.
 - No password is displayed after reset.
 - No external message/email/WhatsApp is sent in this scope.
+
+Result:
+
+- Completed in `admin.html`, `server.mjs`, and the generated worker.
+- Profile reset action calls `/api/customers/:id/reset-password`.
+- The server hashes temporary password `123456`, returns no password hash/salt,
+  and marks `mustChangePassword`.
 
 Prompt:
 
@@ -365,7 +399,7 @@ Acceptance criteria:
 
 Section: Customer Invoices  
 Branch: `feat/customer-screen-invoices`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -375,6 +409,14 @@ Acceptance:
 - Exact provider integration is deferred.
 - Customer screen does not issue official invoices.
 - Empty state is clear.
+
+Result:
+
+- Completed in `admin.html`.
+- Customer profile shows invoice number, date, amount, status, and link from
+  seeded invoice records.
+- Meshulam / Grow remains a future source; no live provider call or invoice
+  issuing was added.
 
 Prompt:
 
@@ -401,7 +443,7 @@ Acceptance criteria:
 
 Section: Customer Metrics  
 Branch: `feat/customer-screen-metrics`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -411,6 +453,13 @@ Acceptance:
 - Profile shows last order date.
 - Metrics derive from persisted orders/payments.
 - Common/frequent products are not shown.
+
+Result:
+
+- Completed in `admin.html`.
+- Profile metrics show total purchases, order count, average order value, and
+  last order date from existing order data.
+- Common/frequent products were not added.
 
 Prompt:
 
@@ -438,7 +487,7 @@ Acceptance criteria:
 
 Section: Mobile and Hebrew QA  
 Branch: `fix/customer-screen-mobile-rtl`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -450,6 +499,13 @@ Acceptance:
 - Hebrew RTL layout is correct.
 - Long names, addresses, invoice links, and notes do not overflow.
 - Main actions remain reachable.
+
+Result:
+
+- Completed in `admin.html`.
+- Customer list, form, profile, quick order modal, and deleted-customer archive
+  use responsive grids, wrapped long text, and RTL layout.
+- `npm run build`, `npm test`, and local API smoke checks passed.
 
 Prompt:
 

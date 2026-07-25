@@ -360,6 +360,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
+      overflow-wrap: anywhere;
     }
 
     .delivery-card.cash {
@@ -370,6 +371,60 @@
     .muted { color: var(--muted); }
     .nowrap { white-space: nowrap; }
     .hidden { display: none !important; }
+    .break-word { overflow-wrap: anywhere; }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.45fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .profile-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .detail-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-list div {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-list span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(23, 33, 29, 0.48);
+      z-index: 20;
+    }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
 
     .empty {
       padding: 22px;
@@ -404,6 +459,7 @@
       }
       .side-note { display: none; }
       .split,
+      .profile-grid,
       .metrics,
       .filters {
         grid-template-columns: 1fr;
@@ -423,6 +479,7 @@
       main { padding: 14px; }
       nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .form-grid,
+      .detail-list,
       .item-row {
         grid-template-columns: 1fr;
       }
@@ -454,12 +511,14 @@
     </main>
   </div>
   <div class="toast hidden" id="toast"></div>
+  <div class="modal-backdrop hidden" id="modalRoot"></div>
 
   <script>
     const STORAGE_KEY = 'driveDogAdminMvpV1';
     const tabs = [
       ['dashboard', 'דשבורד', 'תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.'],
       ['customers', 'לקוחות', 'ניהול לקוחות קיימים בלבד. אין הרשמה פתוחה.'],
+      ['deletedCustomers', 'לקוחות מחוקים', 'ארכיון לקוחות שנמחקו מהמסך הראשי.'],
       ['products', 'מוצרים', 'קטלוג בסיסי של משפחות ווריאנטים.'],
       ['pricing', 'מחירים', 'מחיר אישי או הנחה לפי לקוח ומוצר.'],
       ['orders', 'הזמנות', 'יצירת הזמנה ידנית וניהול סטטוס תשלום.'],
@@ -484,18 +543,25 @@
         { id: 'cp1', customerId: 'c1', productId: 'p1', customPrice: 259, discountPercent: 0, notes: 'מחיר קבוע' },
         { id: 'cp2', customerId: 'c2', productId: 'p4', customPrice: 0, discountPercent: 8, notes: 'הנחת לקוחה קבועה' }
       ],
+      invoices: [
+        { id: 'inv1', customerId: 'c1', invoiceNumber: 'DD-1001', date: '2026-07-22', amount: 259, paymentStatus: 'paid_online', link: 'https://pay.example.test/invoices/DD-1001' },
+        { id: 'inv2', customerId: 'c2', invoiceNumber: 'DD-1002', date: '2026-07-21', amount: 348, paymentStatus: 'paid_online', link: 'https://pay.example.test/invoices/DD-1002' }
+      ],
       orders: [
         { id: 'o1001', customerId: 'c1', createdAt: '2026-07-22', deliveryDate: '2026-07-25', status: 'new', paymentStatus: 'pending_online_payment', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1001', notes: 'לשלוח קישור תשלום', items: [{ productId: 'p1', quantity: 1, unitPrice: 259 }] },
         { id: 'o1002', customerId: 'c2', createdAt: '2026-07-21', deliveryDate: '2026-07-24', status: 'confirmed', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1002', notes: '', items: [{ productId: 'p4', quantity: 2, unitPrice: 174 }] },
         { id: 'o1003', customerId: 'c3', createdAt: '2026-07-20', deliveryDate: '2026-07-26', status: 'confirmed', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'מזומן לשליח', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] }
       ],
-      selected: { customerId: 'c1', productId: 'p1' }
+      selected: { customerId: 'c1', customerProfileId: 'c1', productId: 'p1' }
     };
 
     let state = loadState();
     let currentTab = 'dashboard';
     let customersLoadState = 'loading';
     let customersLoadError = '';
+    let deletedCustomersLoadState = 'idle';
+    let deletedCustomersLoadError = '';
+    let deletedCustomers = [];
     let customersSaving = false;
 
     function clone(value) {
@@ -531,6 +597,23 @@
       } catch (error) {
         customersLoadState = 'error';
         customersLoadError = error.message || 'טעינת הלקוחות נכשלה';
+      }
+      render();
+    }
+
+    async function loadDeletedCustomersFromServer() {
+      deletedCustomersLoadState = 'loading';
+      deletedCustomersLoadError = '';
+      render();
+      try {
+        const response = await fetch('/api/customers/deleted');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'טעינת ארכיון הלקוחות נכשלה');
+        deletedCustomers = data.customers.map(normalizeCustomer);
+        deletedCustomersLoadState = 'ready';
+      } catch (error) {
+        deletedCustomersLoadState = 'error';
+        deletedCustomersLoadError = error.message || 'טעינת ארכיון הלקוחות נכשלה';
       }
       render();
     }
@@ -590,14 +673,27 @@
     }
 
     function customerMetrics(customerId) {
-      const orders = state.orders.filter((order) => order.customerId === customerId);
+      const orders = customerOrders(customerId);
       const total = orders.reduce((sum, order) => sum + orderTotal(order), 0);
       const lastOrderDate = orders.map((order) => order.createdAt || order.deliveryDate || '').sort().at(-1) || '';
       return {
         orderCount: orders.length,
         total,
+        averageOrder: orders.length ? Math.round(total / orders.length) : 0,
         lastOrderDate
       };
+    }
+
+    function customerOrders(customerId) {
+      return state.orders.filter((order) => order.customerId === customerId);
+    }
+
+    function customerInvoices(customerId) {
+      return (state.invoices || []).filter((invoice) => invoice.customerId === customerId);
+    }
+
+    function customerPrices(customerId) {
+      return state.prices.filter((price) => price.customerId === customerId);
     }
 
     function priceFor(customerId, productId) {
@@ -645,6 +741,7 @@
       nav.querySelectorAll('button').forEach((button) => {
         button.addEventListener('click', () => {
           currentTab = button.dataset.tab;
+          if (currentTab === 'deletedCustomers' && deletedCustomersLoadState === 'idle') loadDeletedCustomersFromServer();
           render();
         });
       });
@@ -652,19 +749,25 @@
 
     function render() {
       renderNav();
-      const [, title, subtitle] = tabs.find(([id]) => id === currentTab);
-      document.getElementById('pageTitle').textContent = title;
-      document.getElementById('pageSubtitle').textContent = subtitle;
-      const view = document.getElementById('view');
-      view.innerHTML = ({
+      const views = {
         dashboard: dashboardView,
         customers: customersView,
+        deletedCustomers: deletedCustomersView,
+        customerProfile: customerProfileView,
         products: productsView,
         pricing: pricingView,
         orders: ordersView,
         deliveries: deliveriesView,
         settings: settingsView
-      })[currentTab]();
+      };
+      const tabMeta = tabs.find(([id]) => id === currentTab);
+      const profileCustomer = customer(state.selected.customerProfileId);
+      const title = currentTab === 'customerProfile' ? customerName(profileCustomer) : tabMeta?.[1] || 'Drive Dog';
+      const subtitle = currentTab === 'customerProfile' ? 'פרופיל לקוח: פרטים, הזמנות, חשבוניות, מדדים ואיפוס סיסמה.' : tabMeta?.[2] || '';
+      document.getElementById('pageTitle').textContent = title;
+      document.getElementById('pageSubtitle').textContent = subtitle;
+      const view = document.getElementById('view');
+      view.innerHTML = views[currentTab]();
       bindView();
     }
 
@@ -736,9 +839,104 @@
           <td>${metrics.lastOrderDate || '-'}</td>
           <td>${metrics.orderCount}</td>
           <td><strong>${shekel(metrics.total)}</strong></td>
-          <td><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button><button class="mini danger" data-delete-customer="${item.id}" type="button">מחיקה</button></div></td>
+          <td><div class="row-actions"><button class="mini" data-open-customer="${item.id}" type="button">פתיחה</button><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button><button class="mini danger" data-delete-customer="${item.id}" type="button">מחיקה</button></div></td>
         </tr>`;
       }).join('')}</tbody></table>`;
+    }
+
+    function deletedCustomersView() {
+      if (deletedCustomersLoadState === 'loading') return '<div class="empty">טוען לקוחות מחוקים...</div>';
+      if (deletedCustomersLoadState === 'error') {
+        return `<div class="empty">טעינת הארכיון נכשלה: ${escapeHtml(deletedCustomersLoadError)}<br><button class="button ghost" id="reloadDeletedCustomers" type="button">נסה שוב</button></div>`;
+      }
+      if (!deletedCustomers.length) return '<div class="empty">אין לקוחות מחוקים בארכיון</div>';
+      return `
+        <div class="panel">
+          <div class="panel-head"><h2>ארכיון לקוחות מחוקים</h2><button class="button ghost" id="reloadDeletedCustomers" type="button">רענון</button></div>
+          <div class="table-wrap"><table><thead><tr><th>שם מלא</th><th>טלפון</th><th>עיר</th><th>נמחק בתאריך</th><th>פעולות</th></tr></thead><tbody>${deletedCustomers.map((item) => `
+            <tr>
+              <td><strong>${customerName(item)}</strong><br><span class="muted break-word">${item.address || '-'}</span></td>
+              <td class="nowrap">${item.phone}</td>
+              <td>${item.city || '-'}</td>
+              <td>${item.deletedAt ? item.deletedAt.slice(0, 10) : '-'}</td>
+              <td><button class="mini" data-open-deleted-customer="${item.id}" type="button">פתיחה</button></td>
+            </tr>`).join('')}</tbody></table></div>
+        </div>`;
+    }
+
+    function customerProfileView() {
+      const item = customer(state.selected.customerProfileId) || deletedCustomers.find((deleted) => deleted.id === state.selected.customerProfileId);
+      if (!item) return '<div class="empty">לקוח לא נמצא</div>';
+      const metrics = customerMetrics(item.id);
+      const orders = customerOrders(item.id);
+      const invoices = customerInvoices(item.id);
+      const prices = customerPrices(item.id);
+      return `
+        <div class="profile-grid">
+          <div class="profile-stack">
+            <div class="panel">
+              <div class="panel-head"><h2>פרטי לקוח</h2><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button>${item.deletedAt ? '' : `<button class="mini danger" data-delete-customer="${item.id}" type="button">מחיקה</button>`}</div></div>
+              <div class="detail-list">
+                <div><span>שם מלא</span><strong>${customerName(item)}</strong></div>
+                <div><span>טלפון</span><strong class="nowrap">${item.phone || '-'}</strong></div>
+                <div><span>עיר</span>${item.city || '-'}</div>
+                <div><span>כתובת</span>${item.address || '-'}</div>
+                <div class="field full"><span>הערות משלוח</span>${item.deliveryNotes || 'אין הערות משלוח'}</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>הזמנות קשורות</h2><button class="button ghost" data-order-customer="${item.id}" type="button">מסך הזמנה מלא</button></div>
+              ${customerOrdersSummary(orders)}
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>חשבוניות</h2></div>
+              ${customerInvoicesSummary(invoices)}
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>מחירים אישיים</h2><button class="button ghost" data-price-customer="${item.id}" type="button">הוסף מחיר אישי</button></div>
+              ${customerPricesSummary(prices)}
+            </div>
+          </div>
+          <div class="profile-stack">
+            <div class="panel">
+              <div class="panel-head"><h2>מדדי לקוח</h2></div>
+              <div class="grid metrics">
+                <div class="metric"><span>סך רכישות</span><strong>${shekel(metrics.total)}</strong></div>
+                <div class="metric"><span>מספר הזמנות</span><strong>${metrics.orderCount}</strong></div>
+                <div class="metric"><span>ממוצע להזמנה</span><strong>${shekel(metrics.averageOrder)}</strong></div>
+                <div class="metric"><span>הזמנה אחרונה</span><strong>${metrics.lastOrderDate || '-'}</strong></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>פעולות</h2></div>
+              <div class="toolbar">
+                <button class="button primary" data-quick-order-customer="${item.id}" type="button">הזמנה מהירה</button>
+                <button class="button ghost" data-order-customer="${item.id}" type="button">הזמנה מלאה</button>
+                <button class="button ghost" data-price-customer="${item.id}" type="button">מחיר אישי</button>
+                <button class="button ghost" data-reset-password="${item.id}" type="button">איפוס סיסמה</button>
+              </div>
+              <p class="muted">איפוס סיסמה מגדיר סיסמה זמנית ומחייב החלפה בכניסה הבאה. לא נשלחת הודעה חיצונית מהמסך.</p>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function customerOrdersSummary(rows) {
+      if (!rows.length) return '<div class="empty">אין הזמנות ללקוח הזה</div>';
+      return `<div class="table-wrap"><table><thead><tr><th>מספר</th><th>אספקה</th><th>סה"כ</th><th>תשלום</th></tr></thead><tbody>${rows.map((order) => `
+        <tr><td><strong>${order.id}</strong><br><span class="muted">${order.createdAt}</span></td><td>${order.deliveryDate || '-'}</td><td><strong>${shekel(orderTotal(order))}</strong></td><td><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span></td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function customerInvoicesSummary(rows) {
+      if (!rows.length) return '<div class="empty">אין חשבוניות להצגה. מקור עתידי צפוי להיות Meshulam / Grow.</div>';
+      return `<div class="table-wrap"><table><thead><tr><th>מספר</th><th>תאריך</th><th>סכום</th><th>סטטוס</th><th>קישור</th></tr></thead><tbody>${rows.map((invoice) => `
+        <tr><td>${invoice.invoiceNumber}</td><td>${invoice.date || '-'}</td><td><strong>${shekel(invoice.amount)}</strong></td><td><span class="status ${statusClass(invoice.paymentStatus)}">${statusLabel(invoice.paymentStatus)}</span></td><td><a class="break-word" href="${invoice.link}" target="_blank" rel="noreferrer">פתיחה</a></td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function customerPricesSummary(rows) {
+      if (!rows.length) return '<div class="empty">אין מחירים אישיים ללקוח הזה</div>';
+      return `<div class="table-wrap"><table><thead><tr><th>מוצר</th><th>מחיר אישי</th><th>הנחה</th><th>מחיר להזמנה</th></tr></thead><tbody>${rows.map((price) => `
+        <tr><td>${product(price.productId)?.name || '-'}</td><td>${Number(price.customPrice || 0) > 0 ? shekel(price.customPrice) : '-'}</td><td>${price.discountPercent || 0}%</td><td><strong>${shekel(priceFor(price.customerId, price.productId))}</strong></td></tr>`).join('')}</tbody></table></div>`;
     }
 
     function productsView() {
@@ -919,6 +1117,15 @@
 
     function bindView() {
       document.querySelectorAll('[data-goto]').forEach((button) => button.addEventListener('click', () => { currentTab = button.dataset.goto; render(); }));
+      document.querySelectorAll('[data-open-customer]').forEach((button) => button.addEventListener('click', () => openCustomerProfile(button.dataset.openCustomer)));
+      document.querySelectorAll('[data-open-deleted-customer]').forEach((button) => button.addEventListener('click', () => openCustomerProfile(button.dataset.openDeletedCustomer)));
+      document.querySelectorAll('[data-edit-customer]').forEach((button) => button.addEventListener('click', () => editCustomer(button.dataset.editCustomer)));
+      document.querySelectorAll('[data-delete-customer]').forEach((button) => button.addEventListener('click', () => deleteCustomer(button.dataset.deleteCustomer)));
+      document.querySelectorAll('[data-order-customer]').forEach((button) => button.addEventListener('click', () => openOrdersForCustomer(button.dataset.orderCustomer)));
+      document.querySelectorAll('[data-price-customer]').forEach((button) => button.addEventListener('click', () => openPricingForCustomer(button.dataset.priceCustomer)));
+      document.querySelectorAll('[data-quick-order-customer]').forEach((button) => button.addEventListener('click', () => openQuickOrderModal(button.dataset.quickOrderCustomer)));
+      document.querySelectorAll('[data-reset-password]').forEach((button) => button.addEventListener('click', () => resetCustomerPassword(button.dataset.resetPassword)));
+      document.getElementById('reloadDeletedCustomers')?.addEventListener('click', loadDeletedCustomersFromServer);
       bindCustomers();
       bindProducts();
       bindPricing();
@@ -936,7 +1143,6 @@
         document.querySelector('.table-wrap').innerHTML = customersListContent(rows);
         bindCustomerRows();
       });
-      bindCustomerRows();
       document.getElementById('clearCustomer').addEventListener('click', () => {
         form.reset();
         setValue('customerId', '');
@@ -982,9 +1188,16 @@
     }
 
     function bindCustomerRows() {
-      document.querySelectorAll('[data-edit-customer]').forEach((button) => button.addEventListener('click', () => fillCustomer(button.dataset.editCustomer)));
-      document.querySelectorAll('[data-order-customer]').forEach((button) => button.addEventListener('click', () => { state.selected.customerId = button.dataset.orderCustomer; currentTab = 'orders'; render(); }));
+      document.querySelectorAll('[data-open-customer]').forEach((button) => button.addEventListener('click', () => openCustomerProfile(button.dataset.openCustomer)));
+      document.querySelectorAll('[data-edit-customer]').forEach((button) => button.addEventListener('click', () => editCustomer(button.dataset.editCustomer)));
+      document.querySelectorAll('[data-order-customer]').forEach((button) => button.addEventListener('click', () => openOrdersForCustomer(button.dataset.orderCustomer)));
       document.querySelectorAll('[data-delete-customer]').forEach((button) => button.addEventListener('click', () => deleteCustomer(button.dataset.deleteCustomer)));
+    }
+
+    function editCustomer(id) {
+      currentTab = 'customers';
+      render();
+      fillCustomer(id);
     }
 
     function fillCustomer(id) {
@@ -1014,6 +1227,99 @@
       } catch (error) {
         toast(error.message || 'מחיקת הלקוח נכשלה');
       }
+    }
+
+    function openCustomerProfile(id) {
+      state.selected.customerProfileId = id;
+      currentTab = 'customerProfile';
+      render();
+    }
+
+    function openOrdersForCustomer(id) {
+      state.selected.customerId = id;
+      currentTab = 'orders';
+      render();
+    }
+
+    function openPricingForCustomer(id) {
+      state.selected.customerId = id;
+      currentTab = 'pricing';
+      render();
+    }
+
+    async function resetCustomerPassword(id) {
+      const item = customer(id);
+      if (!item) return;
+      if (!confirm(`לאפס סיסמה ל-${customerName(item)}?`)) return;
+      try {
+        const data = await customerApi(`/api/customers/${encodeURIComponent(id)}/reset-password`, { method: 'POST' });
+        upsert(state.customers, normalizeCustomer(data.customer));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        toast('הסיסמה אופסה. הלקוח יחויב להחליף סיסמה בכניסה הבאה');
+        render();
+      } catch (error) {
+        toast(error.message || 'איפוס הסיסמה נכשל');
+      }
+    }
+
+    function openQuickOrderModal(customerId) {
+      const item = customer(customerId);
+      if (!item) return toast('לקוח לא נמצא');
+      const root = document.getElementById('modalRoot');
+      root.innerHTML = `
+        <div class="modal">
+          <div class="panel-head"><h2>הזמנה מהירה | ${customerName(item)}</h2><button class="mini" id="closeModal" type="button">סגירה</button></div>
+          <form class="order-builder" id="quickOrderForm">
+            <div class="field"><label>מוצר</label>${productSelect('quickOrderProduct')}</div>
+            <div class="field"><label>כמות</label><input id="quickOrderQty" type="number" min="1" value="1"></div>
+            <div class="field"><label>תאריך אספקה</label><input id="quickDeliveryDate" type="date" value="${today()}"></div>
+            <div class="field"><label>סטטוס תשלום</label><select id="quickPaymentStatus"><option value="pending_online_payment">ממתין לתשלום</option><option value="cash_on_delivery">מזומן לשליח</option><option value="paid_cash">שולם במזומן</option><option value="paid_online">שולם אונליין</option></select></div>
+            ${area('הערות להזמנה', 'quickOrderNotes')}
+            <div class="total-line"><span>סה"כ</span><span id="quickOrderTotal">₪0</span></div>
+            <button class="button primary" type="submit">יצירת הזמנה</button>
+          </form>
+        </div>`;
+      root.classList.remove('hidden');
+      document.getElementById('closeModal').addEventListener('click', closeModal);
+      document.getElementById('quickOrderProduct').value = state.selected.productId || state.products[0]?.id || '';
+      ['quickOrderProduct', 'quickOrderQty'].forEach((id) => document.getElementById(id).addEventListener('input', () => recalcQuickOrder(customerId)));
+      document.getElementById('quickOrderForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const productId = value('quickOrderProduct');
+        const quantity = Number(value('quickOrderQty') || 0);
+        if (!productId || quantity <= 0) return toast('צריך לבחור מוצר וכמות');
+        const id = nextId('o', state.orders);
+        const paymentStatus = value('quickPaymentStatus');
+        state.orders.push({
+          id,
+          customerId,
+          createdAt: today(),
+          deliveryDate: value('quickDeliveryDate'),
+          status: paymentStatus === 'paid_online' || paymentStatus === 'paid_cash' ? 'confirmed' : 'new',
+          paymentStatus,
+          source: 'manual',
+          paymentUrl: paymentStatus === 'pending_online_payment' ? `https://pay.example.test/orders/${id}` : '',
+          notes: value('quickOrderNotes'),
+          items: [{ productId, quantity, unitPrice: priceFor(customerId, productId) }]
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        closeModal();
+        toast('הזמנה מהירה נוצרה');
+        render();
+      });
+      recalcQuickOrder(customerId);
+    }
+
+    function recalcQuickOrder(customerId) {
+      const productId = value('quickOrderProduct');
+      const quantity = Number(value('quickOrderQty') || 0);
+      document.getElementById('quickOrderTotal').textContent = shekel(priceFor(customerId, productId) * quantity);
+    }
+
+    function closeModal() {
+      const root = document.getElementById('modalRoot');
+      root.classList.add('hidden');
+      root.innerHTML = '';
     }
 
     function bindProducts() {
@@ -1060,6 +1366,8 @@
     function bindPricing() {
       const form = document.getElementById('priceForm');
       if (!form) return;
+      const priceCustomerNode = document.getElementById('priceCustomer');
+      if (state.selected.customerId) priceCustomerNode.value = state.selected.customerId;
       document.querySelectorAll('[data-delete-price]').forEach((button) => button.addEventListener('click', () => {
         state.prices = state.prices.filter((item) => item.id !== button.dataset.deletePrice);
         saveState('כלל מחיר נמחק');

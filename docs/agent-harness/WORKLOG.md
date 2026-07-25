@@ -142,3 +142,16 @@ changes. Keep entries short and factual.
   keep the customer visible.
 - Updated API tests to cover customer edit, edit validation, and duplicate
   phone errors during edit.
+
+### Customer Screen Plan Completed
+
+- Finished the remaining customer-screen checklist sections on
+  `feat/customer-screen-edit-delete`: deleted-customer archive, customer
+  profile, workflow links, quick order modal, password reset, invoices, metrics,
+  and mobile/RTL refinements.
+- Added active profile actions for full order flow, quick order flow, customer
+  price flow, and reset password.
+- Added invoice seed data for profile display only; Meshulam / Grow remains a
+  future source and no live provider call was added.
+- Verified with `npm run build`, `npm test`, and a local API smoke check for
+  create, reset password, delete, and deleted-customer archive.
