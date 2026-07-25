@@ -165,6 +165,28 @@
       margin-bottom: 18px;
     }
 
+    .page-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .header-logo {
+      width: 56px;
+      height: 56px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #fff7ed;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .page-title-copy {
+      min-width: 0;
+    }
+
     h1 {
       margin: 0 0 5px;
       font-size: 25px;
@@ -571,6 +593,9 @@
       .topbar {
         display: grid;
       }
+      .page-heading {
+        padding-inline-start: 52px;
+      }
       .toolbar {
         justify-content: stretch;
       }
@@ -582,6 +607,10 @@
     @media (max-width: 620px) {
       main { padding: 66px 14px 14px; }
       .topbar { gap: 12px; }
+      .header-logo {
+        width: 48px;
+        height: 48px;
+      }
       h1 { font-size: 22px; }
       .form-grid,
       .detail-list,
@@ -609,9 +638,12 @@
     </aside>
     <main>
       <div class="topbar">
-        <div>
-          <h1 id="pageTitle">דשבורד</h1>
-          <p id="pageSubtitle" class="subtitle">תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.</p>
+        <div class="page-heading">
+          <img class="header-logo" src="/assets/drive-dog-logo.jpg" alt="Drive Dog">
+          <div class="page-title-copy">
+            <h1 id="pageTitle">דשבורד</h1>
+            <p id="pageSubtitle" class="subtitle">תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.</p>
+          </div>
         </div>
         <div class="toolbar">
           <button class="button ghost" id="exportBtn" type="button">ייצוא JSON</button>
