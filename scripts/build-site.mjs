@@ -4,6 +4,7 @@ const questionnaireHtml = readFileSync('questionnaire.html', 'utf8');
 const proposalHtml = readFileSync('proposal.html', 'utf8');
 const adminHtml = readFileSync('admin.html', 'utf8');
 const customerScreenChecklistHtml = readFileSync('customer-screen-checklist.html', 'utf8');
+const driveDogLogo = readFileSync('assets/drive-dog-logo.jpg').toString('base64');
 const demoApiCustomers = [
   { id: 'c1', firstName: 'עמי', lastName: 'כהן', phone: '050-1111111', address: 'הכלנית 12', city: 'ראשון לציון', deliveryNotes: 'להתקשר לפני הגעה', mustChangePassword: false, deletedAt: null, createdAt: '2026-07-22T00:00:00.000Z', updatedAt: '2026-07-22T00:00:00.000Z' },
   { id: 'c2', firstName: 'דנה', lastName: 'לוי', phone: '052-2222222', address: 'הגפן 8', city: 'רחובות', deliveryNotes: 'להשאיר ליד הדלת', mustChangePassword: false, deletedAt: null, createdAt: '2026-07-22T00:00:00.000Z', updatedAt: '2026-07-22T00:00:00.000Z' },
@@ -15,6 +16,7 @@ const proposalHtml = ${JSON.stringify(proposalHtml)};
 const adminHtml = ${JSON.stringify(adminHtml)};
 const customerScreenChecklistHtml = ${JSON.stringify(customerScreenChecklistHtml)};
 const demoApiCustomers = ${JSON.stringify(demoApiCustomers)};
+const driveDogLogo = ${JSON.stringify(driveDogLogo)};
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -24,6 +26,13 @@ function json(body, status = 200) {
       "cache-control": "no-store"
     }
   });
+}
+
+function binaryFromBase64(base64) {
+  const raw = atob(base64);
+  const bytes = new Uint8Array(raw.length);
+  for (let index = 0; index < raw.length; index += 1) bytes[index] = raw.charCodeAt(index);
+  return bytes;
 }
 
 function normalizePhone(phone) {
@@ -99,6 +108,14 @@ export default {
     const url = new URL(request.url);
     const apiResponse = await handleCustomerApi(request, url);
     if (apiResponse) return apiResponse;
+    if (url.pathname === "/assets/drive-dog-logo.jpg") {
+      return new Response(binaryFromBase64(driveDogLogo), {
+        headers: {
+          "content-type": "image/jpeg",
+          "cache-control": "no-store"
+        }
+      });
+    }
     const html = url.pathname === "/" || url.pathname.startsWith("/admin")
       ? adminHtml
       : url.pathname.startsWith("/proposal")
@@ -121,9 +138,11 @@ export default {
 
 mkdirSync('dist/server', { recursive: true });
 mkdirSync('dist/.openai', { recursive: true });
+mkdirSync('dist/assets', { recursive: true });
 writeFileSync('dist/server/index.js', worker);
 writeFileSync('dist/index.html', questionnaireHtml);
 writeFileSync('dist/proposal.html', proposalHtml);
 writeFileSync('dist/admin.html', adminHtml);
 writeFileSync('dist/customer-screen-checklist.html', customerScreenChecklistHtml);
+copyFileSync('assets/drive-dog-logo.jpg', 'dist/assets/drive-dog-logo.jpg');
 copyFileSync('.openai/hosting.json', 'dist/.openai/hosting.json');

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Drive Dog | ניהול</title>
+  <link rel="icon" href="/assets/drive-dog-logo.jpg">
   <style>
     :root {
       color-scheme: light;
@@ -73,11 +74,39 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-height: 44px;
+      gap: 12px;
+      min-height: 64px;
       font-weight: 800;
       font-size: 18px;
       color: #ffe4bb;
+    }
+
+    .brand-logo {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #fff7ed;
+      border: 2px solid rgba(255, 224, 172, 0.72);
+      box-shadow: 0 8px 18px rgba(53, 23, 4, 0.26);
+    }
+
+    .brand-name {
+      display: grid;
+      gap: 2px;
+      line-height: 1.05;
+    }
+
+    .brand-name strong {
+      color: #fff7ed;
+      font-size: 18px;
+    }
+
+    .brand-name span {
+      color: rgba(255, 244, 229, 0.72);
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .sidebar-close {
@@ -90,43 +119,6 @@
       color: #ffffff;
       font-size: 22px;
       line-height: 1;
-    }
-
-    .mark {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      position: relative;
-      flex: 0 0 auto;
-      background: var(--brand);
-      box-shadow: inset 0 -3px 0 rgba(53, 23, 4, 0.18);
-    }
-
-    .mark span,
-    .mark i {
-      position: absolute;
-      display: block;
-      background: #fff7ed;
-    }
-
-    .mark span {
-      width: 7px;
-      height: 8px;
-      border-radius: 999px;
-    }
-
-    .mark span:nth-child(1) { top: 8px; right: 8px; }
-    .mark span:nth-child(2) { top: 5px; right: 15px; }
-    .mark span:nth-child(3) { top: 8px; right: 22px; }
-    .mark span:nth-child(4) { top: 15px; right: 25px; }
-
-    .mark i {
-      width: 15px;
-      height: 13px;
-      right: 11px;
-      bottom: 7px;
-      border-radius: 50% 50% 45% 45%;
-      transform: rotate(-12deg);
     }
 
     nav {
@@ -559,6 +551,10 @@
         box-shadow: -16px 0 34px rgba(53, 23, 4, 0.24);
       }
       body.menu-open .sidebar { transform: translateX(0); }
+      .brand-logo {
+        width: 58px;
+        height: 58px;
+      }
       .sidebar-close { display: grid; place-items: center; }
       nav {
         grid-template-columns: 1fr;
@@ -603,7 +599,11 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <div class="app">
     <aside class="sidebar" id="sidebar">
-      <div class="brand"><span class="mark" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i></span><span>Drive Dog</span><button class="sidebar-close" id="sidebarClose" type="button" aria-label="סגירת תפריט">×</button></div>
+      <div class="brand">
+        <img class="brand-logo" src="/assets/drive-dog-logo.jpg" alt="Drive Dog">
+        <span class="brand-name"><strong>דרייב דוג</strong><span>Drive Dog</span></span>
+        <button class="sidebar-close" id="sidebarClose" type="button" aria-label="סגירת תפריט">×</button>
+      </div>
       <nav id="nav"></nav>
       <div class="side-note">MVP פנימי: הדאטה נשמר בדפדפן בלבד. Grow / משולם מסומן כ-stub ולא מחייב בפועל.</div>
     </aside>
