@@ -124,3 +124,8 @@ changes. Keep entries short and factual.
   and password reset to temporary `123456` with forced next-login change.
 - Added `tests/customer-api.test.mjs`; `npm test` covers the customer API
   persistence and validation flow.
+- Implemented the customer list slice on branch `feat/customer-screen-list`:
+  `admin.html` now loads customers from `/api/customers`, shows approved list
+  columns, calculates last order/order count/total purchases from existing
+  orders, searches by full name/address/phone/city, and has loading/empty/error
+  states.

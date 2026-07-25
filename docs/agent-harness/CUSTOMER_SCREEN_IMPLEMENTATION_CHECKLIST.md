@@ -121,7 +121,7 @@ Acceptance criteria:
 
 Section: Customer List  
 Branch: `feat/customer-screen-list`  
-Status: pending
+Status: completed
 
 Acceptance:
 
@@ -133,6 +133,15 @@ Acceptance:
 - Deleted customers are not shown in the main list.
 - Empty, loading, and error states exist.
 - Mobile table/list is usable without horizontal overflow.
+
+Result:
+
+- Completed in `admin.html`.
+- Customer list loads from `/api/customers`.
+- List columns now include full name, phone, city, last order date, order count,
+  total purchases, and actions.
+- Search now covers full name, address, phone, and city.
+- Loading, empty, and error states are present.
 
 Prompt:
 

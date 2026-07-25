@@ -489,6 +489,8 @@
 
     let state = loadState();
     let currentTab = 'dashboard';
+    let customersLoadState = 'loading';
+    let customersLoadError = '';
 
     function clone(value) {
       return JSON.parse(JSON.stringify(value));
@@ -510,6 +512,35 @@
       render();
     }
 
+    async function loadCustomersFromServer() {
+      customersLoadState = 'loading';
+      customersLoadError = '';
+      render();
+      try {
+        const response = await fetch('/api/customers');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'טעינת הלקוחות נכשלה');
+        state.customers = data.customers.map(normalizeCustomer);
+        customersLoadState = 'ready';
+      } catch (error) {
+        customersLoadState = 'error';
+        customersLoadError = error.message || 'טעינת הלקוחות נכשלה';
+      }
+      render();
+    }
+
+    function normalizeCustomer(item) {
+      const firstName = item.firstName || String(item.name || '').trim().split(/\s+/)[0] || '';
+      const lastName = item.lastName || String(item.name || '').trim().split(/\s+/).slice(1).join(' ');
+      return {
+        ...item,
+        firstName,
+        lastName,
+        name: [firstName, lastName].filter(Boolean).join(' '),
+        active: item.active !== false
+      };
+    }
+
     function shekel(value) {
       return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(value || 0);
     }
@@ -526,12 +557,28 @@
       return state.customers.find((item) => item.id === id);
     }
 
+    function customerName(item) {
+      if (!item) return '-';
+      return [item.firstName, item.lastName].filter(Boolean).join(' ') || item.name || '-';
+    }
+
     function product(id) {
       return state.products.find((item) => item.id === id);
     }
 
     function orderTotal(order) {
       return order.items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unitPrice || 0), 0);
+    }
+
+    function customerMetrics(customerId) {
+      const orders = state.orders.filter((order) => order.customerId === customerId);
+      const total = orders.reduce((sum, order) => sum + orderTotal(order), 0);
+      const lastOrderDate = orders.map((order) => order.createdAt || order.deliveryDate || '').sort().at(-1) || '';
+      return {
+        orderCount: orders.length,
+        total,
+        lastOrderDate
+      };
     }
 
     function priceFor(customerId, productId) {
@@ -608,7 +655,7 @@
       const revenue = state.orders.filter((order) => ['paid_online', 'paid_cash'].includes(order.paymentStatus)).reduce((sum, order) => sum + orderTotal(order), 0);
       return `
         <div class="grid metrics">
-          <div class="metric"><span>לקוחות פעילים</span><strong>${state.customers.filter((item) => item.active).length}</strong></div>
+          <div class="metric"><span>לקוחות</span><strong>${state.customers.filter((item) => !item.deletedAt).length}</strong></div>
           <div class="metric"><span>מוצרים פעילים</span><strong>${state.products.filter((item) => item.active).length}</strong></div>
           <div class="metric"><span>הזמנות פתוחות</span><strong>${openOrders.length}</strong></div>
           <div class="metric"><span>שולם בדמו</span><strong>${shekel(revenue)}</strong></div>
@@ -633,8 +680,8 @@
       return `
         <div class="split">
           <div class="panel">
-            <div class="panel-head"><h2>לקוחות</h2><input id="customerSearch" placeholder="חיפוש לפי שם, טלפון או עיר"></div>
-            <div class="table-wrap">${customersTable(state.customers)}</div>
+            <div class="panel-head"><h2>לקוחות</h2><input id="customerSearch" placeholder="חיפוש לפי שם, כתובת, טלפון או עיר"></div>
+            <div class="table-wrap">${customersListContent(state.customers)}</div>
           </div>
           <form class="panel form-grid" id="customerForm">
             <div class="field full"><h2>לקוח חדש / עריכה</h2></div>
@@ -652,15 +699,29 @@
         </div>`;
     }
 
+    function customersListContent(rows) {
+      if (customersLoadState === 'loading') return '<div class="empty">טוען לקוחות מהשרת...</div>';
+      if (customersLoadState === 'error') {
+        return `<div class="empty">טעינת הלקוחות נכשלה: ${escapeHtml(customersLoadError)}<br><button class="button ghost" id="reloadCustomers" type="button">נסה שוב</button></div>`;
+      }
+      return customersTable(rows);
+    }
+
     function customersTable(rows) {
-      return `<table><thead><tr><th>שם</th><th>טלפון</th><th>עיר/אזור</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>${rows.map((item) => `
+      if (!rows.length) return '<div class="empty">אין לקוחות להצגה</div>';
+      return `<table><thead><tr><th>שם מלא</th><th>טלפון</th><th>עיר</th><th>הזמנה אחרונה</th><th>מספר הזמנות</th><th>סך רכישות</th><th>פעולות</th></tr></thead><tbody>${rows.map((item) => {
+        const metrics = customerMetrics(item.id);
+        return `
         <tr>
-          <td><strong>${item.name}</strong><br><span class="muted">${item.address}</span></td>
+          <td><strong>${customerName(item)}</strong><br><span class="muted">${item.address || '-'}</span></td>
           <td class="nowrap">${item.phone}</td>
-          <td>${item.city}<br><span class="muted">${item.area}</span></td>
-          <td><span class="status ${item.active ? 'ok' : 'danger'}">${item.active ? 'פעיל' : 'לא פעיל'}</span></td>
+          <td>${item.city || '-'}</td>
+          <td>${metrics.lastOrderDate || '-'}</td>
+          <td>${metrics.orderCount}</td>
+          <td><strong>${shekel(metrics.total)}</strong></td>
           <td><div class="row-actions"><button class="mini" data-edit-customer="${item.id}" type="button">עריכה</button><button class="mini" data-order-customer="${item.id}" type="button">הזמנה</button></div></td>
-        </tr>`).join('')}</tbody></table>`;
+        </tr>`;
+      }).join('')}</tbody></table>`;
     }
 
     function productsView() {
@@ -705,7 +766,7 @@
             <div class="panel-head"><h2>מחירים אישיים</h2></div>
             <div class="table-wrap"><table><thead><tr><th>לקוח</th><th>מוצר</th><th>מחיר אישי</th><th>הנחה</th><th>מחיר להזמנה</th><th>פעולות</th></tr></thead><tbody>${state.prices.map((item) => `
               <tr>
-                <td>${customer(item.customerId)?.name || '-'}</td>
+                <td>${customerName(customer(item.customerId))}</td>
                 <td>${product(item.productId)?.name || '-'}</td>
                 <td>${Number(item.customPrice || 0) > 0 ? shekel(item.customPrice) : '-'}</td>
                 <td>${item.discountPercent || 0}%</td>
@@ -760,7 +821,7 @@
         const c = customer(order.customerId);
         return `<tr>
           <td><strong>${order.id}</strong><br><span class="muted">${order.createdAt}</span></td>
-          <td>${c?.name || '-'}<br><span class="muted">${c ? `${c.city} / ${c.area}` : ''}</span></td>
+          <td>${customerName(c)}<br><span class="muted">${c ? `${c.city || ''}` : ''}</span></td>
           <td>${order.deliveryDate || '-'}<br><span class="status ${statusClass(order.status)}">${statusLabel(order.status)}</span></td>
           <td>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</td>
           <td><strong>${shekel(orderTotal(order))}</strong></td>
@@ -785,8 +846,8 @@
         const c = customer(order.customerId);
         const cash = order.paymentStatus === 'cash_on_delivery';
         return `<article class="delivery-card ${cash ? 'cash' : ''}">
-          <strong>${order.deliveryDate || 'ללא תאריך'} | ${c?.name || '-'}</strong>
-          <p class="muted">${c?.address || ''}, ${c?.city || ''} | ${c?.area || ''}</p>
+          <strong>${order.deliveryDate || 'ללא תאריך'} | ${customerName(c)}</strong>
+          <p class="muted">${c?.address || ''}, ${c?.city || ''}</p>
           <p>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</p>
           <p><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span> <strong>${shekel(orderTotal(order))}</strong></p>
           ${order.notes ? `<p class="muted">${order.notes}</p>` : ''}
@@ -817,12 +878,22 @@
       return `<div class="field full"><label>${labelText}</label><textarea id="${id}"></textarea></div>`;
     }
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    }
+
     function hiddenId(id) {
       return `<input id="${id}" type="hidden">`;
     }
 
     function customerSelect(id) {
-      return `<select id="${id}">${state.customers.filter((item) => item.active).map((item) => `<option value="${item.id}">${item.name} | ${item.phone}</option>`).join('')}</select>`;
+      return `<select id="${id}">${state.customers.filter((item) => item.active !== false && !item.deletedAt).map((item) => `<option value="${item.id}">${customerName(item)} | ${item.phone}</option>`).join('')}</select>`;
     }
 
     function productSelect(id) {
@@ -841,10 +912,11 @@
     function bindCustomers() {
       const form = document.getElementById('customerForm');
       if (!form) return;
+      document.getElementById('reloadCustomers')?.addEventListener('click', loadCustomersFromServer);
       document.getElementById('customerSearch').addEventListener('input', (event) => {
         const q = event.target.value.trim().toLowerCase();
-        const rows = state.customers.filter((item) => [item.name, item.phone, item.city, item.area].join(' ').toLowerCase().includes(q));
-        document.querySelector('.table-wrap').innerHTML = customersTable(rows);
+        const rows = state.customers.filter((item) => [customerName(item), item.address, item.phone, item.city].join(' ').toLowerCase().includes(q));
+        document.querySelector('.table-wrap').innerHTML = customersListContent(rows);
         bindCustomerRows();
       });
       bindCustomerRows();
@@ -1033,7 +1105,7 @@
       const date = value('orderDateFilter');
       const rows = state.orders.filter((order) => {
         const c = customer(order.customerId);
-        const areaText = [c?.city, c?.area, c?.name].join(' ').toLowerCase();
+        const areaText = [c?.city, customerName(c), c?.address].join(' ').toLowerCase();
         return (!payment || order.paymentStatus === payment) && (!area || areaText.includes(area)) && (!date || order.deliveryDate === date);
       });
       document.getElementById('ordersTable').innerHTML = ordersTable(rows);
@@ -1067,7 +1139,7 @@
         const q = filter.value.trim().toLowerCase();
         const rows = state.orders.filter((order) => {
           const c = customer(order.customerId);
-          return [c?.name, c?.city, c?.area, c?.address].join(' ').toLowerCase().includes(q);
+          return [customerName(c), c?.city, c?.address].join(' ').toLowerCase().includes(q);
         });
         document.getElementById('deliveryList').innerHTML = deliveryCards(rows);
       });
@@ -1105,6 +1177,7 @@
     });
 
     render();
+    loadCustomersFromServer();
   </script>
 </body>
 </html>
