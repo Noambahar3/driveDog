@@ -268,6 +268,151 @@
       font-size: 28px;
     }
 
+    .dashboard-hero {
+      margin-bottom: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 250, 0.94), rgba(255, 224, 172, 0.82)),
+        radial-gradient(circle at 12% 18%, rgba(244, 155, 37, 0.28), transparent 34%),
+        linear-gradient(135deg, #fff7ed, #f3d1a3);
+      box-shadow: var(--shadow);
+    }
+
+    .dashboard-hero .panel-head {
+      margin-bottom: 0;
+      align-items: flex-start;
+    }
+
+    .dashboard-hero h2 {
+      font-size: 22px;
+    }
+
+    .dashboard-hero p {
+      max-width: 720px;
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .month-select {
+      width: auto;
+      min-width: 156px;
+      background: #ffffff;
+      font-weight: 700;
+    }
+
+    .metric.debt {
+      border-color: #eca041;
+      background: #fff1dc;
+    }
+
+    .metric.success {
+      border-color: #9fca81;
+      background: #f3faed;
+    }
+
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .dashboard-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .income-card {
+      display: grid;
+      grid-template-columns: minmax(190px, 0.8fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .pie {
+      width: min(220px, 100%);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--brand) 0deg, var(--brand) 360deg);
+      box-shadow: inset 0 0 0 18px rgba(255, 255, 255, 0.74), 0 10px 24px rgba(89, 39, 0, 0.12);
+    }
+
+    .legend {
+      display: grid;
+      gap: 9px;
+    }
+
+    .legend-row {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .dashboard-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dashboard-filters .mini.active {
+      border-color: #d87510;
+      background: var(--brand);
+      color: var(--brand-ink);
+    }
+
+    .dashboard-filters select {
+      width: auto;
+      min-width: 158px;
+    }
+
+    .order-card {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .order-card.attention {
+      border-color: #eca041;
+      background: #fff7ec;
+    }
+
+    .order-card-head,
+    .order-card-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .order-card-foot {
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .amount-strong {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
     .panel {
       padding: 16px;
       overflow: hidden;
@@ -586,9 +731,16 @@
       main { padding-top: 68px; }
       .split,
       .profile-grid,
+      .dashboard-layout,
+      .income-card,
       .metrics,
       .filters {
         grid-template-columns: 1fr;
+      }
+      .dashboard-hero .panel-head,
+      .order-card-head,
+      .order-card-foot {
+        display: grid;
       }
       .topbar {
         display: grid;
@@ -653,7 +805,7 @@
   <div class="modal-backdrop hidden" id="modalRoot"></div>
 
   <script>
-    const STORAGE_KEY = 'driveDogAdminMvpV1';
+    const STORAGE_KEY = 'driveDogAdminMvpV2';
     const tabs = [
       ['dashboard', 'דשבורד', 'תמונת מצב קצרה על לקוחות, הזמנות ותשלומים.'],
       ['customers', 'לקוחות', 'ניהול לקוחות קיימים בלבד. אין הרשמה פתוחה.'],
@@ -687,9 +839,17 @@
         { id: 'inv2', customerId: 'c2', invoiceNumber: 'DD-1002', date: '2026-07-21', amount: 348, paymentStatus: 'paid_online', link: 'https://pay.example.test/invoices/DD-1002' }
       ],
       orders: [
-        { id: 'o1001', customerId: 'c1', createdAt: '2026-07-22', deliveryDate: '2026-07-25', status: 'new', paymentStatus: 'pending_online_payment', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1001', notes: 'לשלוח קישור תשלום', items: [{ productId: 'p1', quantity: 1, unitPrice: 259 }] },
-        { id: 'o1002', customerId: 'c2', createdAt: '2026-07-21', deliveryDate: '2026-07-24', status: 'confirmed', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1002', notes: '', items: [{ productId: 'p4', quantity: 2, unitPrice: 174 }] },
-        { id: 'o1003', customerId: 'c3', createdAt: '2026-07-20', deliveryDate: '2026-07-26', status: 'confirmed', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'מזומן לשליח', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] }
+        { id: 'o1001', customerId: 'c1', createdAt: '2026-07-22', deliveryDate: '2026-07-27', status: 'new', paymentStatus: 'pending_online_payment', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1001', notes: 'צריך לספק השבוע, הלקוח עוד לא שילם', items: [{ productId: 'p1', quantity: 1, unitPrice: 259 }] },
+        { id: 'o1002', customerId: 'c2', createdAt: '2026-07-21', deliveryDate: '2026-07-28', status: 'confirmed', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1002', notes: 'שולם מראש, ממתין לאספקה', items: [{ productId: 'p4', quantity: 2, unitPrice: 174 }] },
+        { id: 'o1003', customerId: 'c3', createdAt: '2026-07-20', deliveryDate: '2026-07-26', status: 'confirmed', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'מזומן לשליח', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] },
+        { id: 'o1004', customerId: 'c1', createdAt: '2026-07-18', deliveryDate: '2026-07-23', status: 'delivered', paymentStatus: 'paid_cash', source: 'manual', paymentUrl: '', notes: 'שולם במזומן בזמן אספקה', items: [{ productId: 'p2', quantity: 1, unitPrice: 295 }] },
+        { id: 'o1005', customerId: 'c2', createdAt: '2026-07-15', deliveryDate: '2026-07-22', status: 'delivered', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1005', notes: 'שולם אונליין', items: [{ productId: 'p5', quantity: 1, unitPrice: 244 }] },
+        { id: 'o1006', customerId: 'c3', createdAt: '2026-07-12', deliveryDate: '2026-07-21', status: 'delivered', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'סופק, הלקוח ביקש לשלם בהמשך', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] },
+        { id: 'o1007', customerId: 'c1', createdAt: '2026-07-08', deliveryDate: '2026-07-19', status: 'delivered', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1007', notes: '', items: [{ productId: 'p1', quantity: 1, unitPrice: 259 }] },
+        { id: 'o1008', customerId: 'c2', createdAt: '2026-07-05', deliveryDate: '2026-07-16', status: 'delivered', paymentStatus: 'paid_cash', source: 'manual', paymentUrl: '', notes: '', items: [{ productId: 'p4', quantity: 1, unitPrice: 174 }] },
+        { id: 'o1009', customerId: 'c3', createdAt: '2026-06-26', deliveryDate: '2026-06-30', status: 'delivered', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1009', notes: '', items: [{ productId: 'p3', quantity: 1, unitPrice: 349 }] },
+        { id: 'o1010', customerId: 'c1', createdAt: '2026-06-18', deliveryDate: '2026-06-22', status: 'delivered', paymentStatus: 'cash_on_delivery', source: 'manual', paymentUrl: '', notes: 'סופק ביוני, עדיין לא שולם', items: [{ productId: 'p2', quantity: 1, unitPrice: 295 }] },
+        { id: 'o1011', customerId: 'c2', createdAt: '2026-08-02', deliveryDate: '2026-08-06', status: 'delivered', paymentStatus: 'paid_online', source: 'manual', paymentUrl: 'https://pay.example.test/orders/o1011', notes: 'דוגמת אוגוסט', items: [{ productId: 'p5', quantity: 2, unitPrice: 244 }] }
       ],
       selected: { customerId: 'c1', customerProfileId: 'c1', productId: 'p1' }
     };
@@ -850,6 +1010,10 @@
         confirmed: 'מאושרת',
         delivered: 'סופקה',
         cancelled: 'בוטלה',
+        awaiting_delivery: 'ממתין לאספקה',
+        paid_awaiting_delivery: 'שולם - ממתין לאספקה',
+        delivered_unpaid: 'סופק - לא שולם',
+        delivered_paid: 'סופק ושולם',
         pending_online_payment: 'ממתין לתשלום',
         cash_on_delivery: 'מזומן לשליח',
         paid_cash: 'שולם במזומן',
@@ -860,10 +1024,62 @@
     }
 
     function statusClass(value) {
-      if (['paid_online', 'paid_cash', 'delivered', 'confirmed'].includes(value)) return 'ok';
-      if (['cash_on_delivery', 'pending_online_payment', 'new'].includes(value)) return 'warn';
+      if (['paid_online', 'paid_cash', 'delivered', 'confirmed', 'delivered_paid', 'paid_awaiting_delivery'].includes(value)) return 'ok';
+      if (['cash_on_delivery', 'pending_online_payment', 'new', 'awaiting_delivery', 'delivered_unpaid'].includes(value)) return 'warn';
       if (['failed', 'cancelled'].includes(value)) return 'danger';
       return '';
+    }
+
+    function isPaid(order) {
+      return ['paid_online', 'paid_cash'].includes(order.paymentStatus);
+    }
+
+    function isDelivered(order) {
+      return order.status === 'delivered';
+    }
+
+    function dashboardStatus(order) {
+      if (isDelivered(order) && isPaid(order)) return 'delivered_paid';
+      if (isDelivered(order) && !isPaid(order)) return 'delivered_unpaid';
+      if (!isDelivered(order) && isPaid(order)) return 'paid_awaiting_delivery';
+      return 'awaiting_delivery';
+    }
+
+    function incomeCategory(order) {
+      if (order.paymentStatus === 'paid_online') return 'paid_online';
+      if (order.paymentStatus === 'paid_cash') return 'paid_cash';
+      if (isDelivered(order) && !isPaid(order)) return 'delivered_unpaid';
+      return '';
+    }
+
+    function incomeOrdersForMonth(monthKeyValue) {
+      return state.orders.filter((order) => {
+        const category = incomeCategory(order);
+        return category && orderMonthKey(order) === monthKeyValue;
+      });
+    }
+
+    function orderMonthKey(order) {
+      return String(order.deliveryDate || order.createdAt || '').slice(0, 7);
+    }
+
+    function monthLabel(monthKeyValue) {
+      if (!monthKeyValue) return 'החודש';
+      const [year, month] = monthKeyValue.split('-').map(Number);
+      return new Intl.DateTimeFormat('he-IL', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1));
+    }
+
+    function availableIncomeMonths() {
+      const months = Array.from(new Set(state.orders.map(orderMonthKey).filter(Boolean))).sort();
+      return months.length ? months : [today().slice(0, 7)];
+    }
+
+    function monthOptions(selectedMonth) {
+      return availableIncomeMonths().map((month) => `<option value="${month}" ${month === selectedMonth ? 'selected' : ''}>${monthLabel(month)}</option>`).join('');
+    }
+
+    function cssColor(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     }
 
     function toast(message) {
@@ -926,30 +1142,143 @@
     }
 
     function dashboardView() {
-      const openOrders = state.orders.filter((order) => order.status !== 'delivered' && order.status !== 'cancelled');
-      const cash = state.orders.filter((order) => order.paymentStatus === 'cash_on_delivery');
-      const revenue = state.orders.filter((order) => ['paid_online', 'paid_cash'].includes(order.paymentStatus)).reduce((sum, order) => sum + orderTotal(order), 0);
+      const months = availableIncomeMonths();
+      const selectedMonth = state.selected.dashboardMonth || months.at(-1);
+      state.selected.dashboardMonth = selectedMonth;
+      const openOrders = state.orders.filter((order) => !isDelivered(order) && order.status !== 'cancelled');
+      const deliveredRecent = state.orders.filter(isDelivered).sort((a, b) => (b.deliveryDate || '').localeCompare(a.deliveryDate || '')).slice(0, 10);
+      const unpaidDelivered = state.orders.filter((order) => dashboardStatus(order) === 'delivered_unpaid');
+      const incomeOrders = incomeOrdersForMonth(selectedMonth);
+      const incomeTotal = incomeOrders.reduce((sum, order) => sum + orderTotal(order), 0);
+      const paidTotal = incomeOrders.filter(isPaid).reduce((sum, order) => sum + orderTotal(order), 0);
+      const debtTotal = unpaidDelivered.reduce((sum, order) => sum + orderTotal(order), 0);
       return `
-        <div class="grid metrics">
-          <div class="metric"><span>לקוחות</span><strong>${state.customers.filter((item) => !item.deletedAt).length}</strong></div>
-          <div class="metric"><span>מוצרים פעילים</span><strong>${state.products.filter((item) => item.active).length}</strong></div>
-          <div class="metric"><span>הזמנות פתוחות</span><strong>${openOrders.length}</strong></div>
-          <div class="metric"><span>שולם בדמו</span><strong>${shekel(revenue)}</strong></div>
-        </div>
-        <div class="split">
-          <div class="panel">
-            <div class="panel-head"><h2>הזמנות קרובות</h2><button class="button primary" data-goto="orders" type="button">הזמנה חדשה</button></div>
-            ${ordersTable(state.orders.slice().sort((a, b) => (a.deliveryDate || '').localeCompare(b.deliveryDate || '')).slice(0, 6))}
+        <div class="dashboard-hero">
+          <div class="panel-head">
+            <div>
+              <h2>תמונת מצב ניהולית</h2>
+              <p>מבט מהיר על אספקות שצריך לבצע, כסף שכבר נכנס, וחוב שנוצר מלקוחות שקיבלו מזון ועדיין לא שילמו.</p>
+            </div>
+            <select class="month-select" id="dashboardMonth" aria-label="בחירת חודש">${monthOptions(selectedMonth)}</select>
           </div>
-          <div class="panel">
-            <div class="panel-head"><h2>תשומת לב</h2></div>
-            <div class="list">
-              <div class="delivery-card cash"><strong>${cash.length} הזמנות מזומן לשליח</strong><br><span class="muted">צריך לוודא גבייה וסימון ידני.</span></div>
-              <div class="delivery-card"><strong>Grow / משולם עדיין stub</strong><br><span class="muted">כפתור קישור תשלום יוצר URL בדיקה בלבד.</span></div>
-              <div class="delivery-card"><strong>פורטל לקוח בשלב הבא</strong><br><span class="muted">טלפון + סיסמה והחלפת סיסמה ראשונה כבר מוגדרים באפיון.</span></div>
+        </div>
+        <div class="grid metrics">
+          <div class="metric"><span>הזמנות פתוחות לאספקה</span><strong>${openOrders.length}</strong></div>
+          <div class="metric success"><span>שולם החודש</span><strong>${shekel(paidTotal)}</strong></div>
+          <div class="metric debt"><span>סופק ולא שולם</span><strong>${shekel(debtTotal)}</strong></div>
+          <div class="metric"><span>סופקו לאחרונה</span><strong>${deliveredRecent.length}</strong></div>
+        </div>
+        <div class="dashboard-layout">
+          <div class="dashboard-stack">
+            <div class="panel">
+              <div class="panel-head"><h2>הכנסה חודשית | ${monthLabel(selectedMonth)}</h2><strong class="amount-strong">${shekel(incomeTotal)}</strong></div>
+              ${incomeBreakdown(incomeOrders)}
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>הזמנות פתוחות שצריך לספק</h2>
+                <div class="dashboard-filters">
+                  <button class="mini active" data-dashboard-filter="all" type="button">הכל</button>
+                  <button class="mini" data-dashboard-filter="unpaid" type="button">לא שולם</button>
+                  <button class="mini" data-dashboard-filter="paid" type="button">שולם</button>
+                  <button class="mini" data-dashboard-filter="soon" type="button">היום/קרוב</button>
+                  <select id="dashboardSort" aria-label="מיון הזמנות פתוחות">
+                    <option value="date">מיון לפי אספקה</option>
+                    <option value="amount">מיון לפי סכום</option>
+                  </select>
+                </div>
+              </div>
+              <div class="list" id="dashboardOpenOrders">${dashboardOrderCards(openOrders, { compact: false })}</div>
+            </div>
+          </div>
+          <div class="dashboard-stack">
+            <div class="panel">
+              <div class="panel-head"><h2>סופקו לאחרונה</h2><span class="status warn">${unpaidDelivered.length} לא שולמו</span></div>
+              <div class="list">${dashboardOrderCards(deliveredRecent, { compact: true })}</div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h2>חוב לפי לקוח</h2></div>
+              ${customerDebtList(unpaidDelivered)}
             </div>
           </div>
         </div>`;
+    }
+
+    function incomeBreakdown(rows) {
+      const categories = [
+        ['paid_online', 'שולם אונליין', '#f49b25'],
+        ['paid_cash', 'שולם מזומן', '#3f7b35'],
+        ['delivered_unpaid', 'סופק ולא שולם', '#a95f00']
+      ];
+      const totals = categories.map(([key, label, color]) => ({
+        key,
+        label,
+        color,
+        total: rows.filter((order) => incomeCategory(order) === key).reduce((sum, order) => sum + orderTotal(order), 0)
+      }));
+      const total = totals.reduce((sum, item) => sum + item.total, 0);
+      let cursor = 0;
+      const segments = totals.map((item) => {
+        const start = cursor;
+        const size = total ? (item.total / total) * 360 : 0;
+        cursor += size;
+        return `${item.color} ${start}deg ${cursor}deg`;
+      }).filter(Boolean).join(', ');
+      const pieStyle = segments ? `style="background: conic-gradient(${segments});"` : '';
+      return `
+        <div class="income-card">
+          <div class="pie" ${pieStyle} aria-label="גרף הכנסה חודשית"></div>
+          <div class="legend">
+            ${totals.map((item) => `
+              <div class="legend-row">
+                <span class="legend-swatch" style="background:${item.color}"></span>
+                <span>${item.label}</span>
+                <strong>${shekel(item.total)}</strong>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    function dashboardOrderCards(rows, options = {}) {
+      if (!rows.length) return '<div class="empty">אין הזמנות להצגה</div>';
+      return rows.map((order) => {
+        const c = customer(order.customerId);
+        const status = dashboardStatus(order);
+        const attention = status === 'delivered_unpaid' || (!isDelivered(order) && !isPaid(order));
+        return `
+          <article class="order-card ${attention ? 'attention' : ''}">
+            <div class="order-card-head">
+              <div>
+                <strong>${customerName(c)}</strong>
+                <div class="muted">${c?.city || '-'} · ${order.deliveryDate || 'ללא תאריך'}</div>
+              </div>
+              <span class="status ${statusClass(status)}">${statusLabel(status)}</span>
+            </div>
+            ${options.compact ? '' : `<div class="muted">${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</div>`}
+            <div class="order-card-foot">
+              <span>${order.notes || order.id}</span>
+              <strong class="amount-strong">${shekel(orderTotal(order))}</strong>
+            </div>
+          </article>`;
+      }).join('');
+    }
+
+    function customerDebtList(rows) {
+      if (!rows.length) return '<div class="empty">אין חוב פתוח כרגע</div>';
+      const totals = rows.reduce((map, order) => {
+        const current = map.get(order.customerId) || { customerId: order.customerId, count: 0, total: 0 };
+        current.count += 1;
+        current.total += orderTotal(order);
+        map.set(order.customerId, current);
+        return map;
+      }, new Map());
+      const items = Array.from(totals.values()).sort((a, b) => b.total - a.total);
+      return `<div class="list">${items.map((item) => `
+        <div class="delivery-card cash">
+          <strong>${customerName(customer(item.customerId))}</strong><br>
+          <span class="muted">${item.count} הזמנות שסופקו ולא שולמו</span>
+          <div class="amount-strong">${shekel(item.total)}</div>
+        </div>`).join('')}</div>`;
     }
 
     function customersView() {
@@ -1280,11 +1609,51 @@
       document.querySelectorAll('[data-quick-order-customer]').forEach((button) => button.addEventListener('click', () => openQuickOrderModal(button.dataset.quickOrderCustomer)));
       document.querySelectorAll('[data-reset-password]').forEach((button) => button.addEventListener('click', () => resetCustomerPassword(button.dataset.resetPassword)));
       document.getElementById('reloadDeletedCustomers')?.addEventListener('click', loadDeletedCustomersFromServer);
+      bindDashboard();
       bindCustomers();
       bindProducts();
       bindPricing();
       bindOrders();
       bindDeliveries();
+    }
+
+    function bindDashboard() {
+      const monthSelect = document.getElementById('dashboardMonth');
+      if (!monthSelect) return;
+      monthSelect.addEventListener('change', () => {
+        state.selected.dashboardMonth = monthSelect.value;
+        render();
+      });
+      let activeFilter = 'all';
+      const sortSelect = document.getElementById('dashboardSort');
+      const filterButtons = Array.from(document.querySelectorAll('[data-dashboard-filter]'));
+      const updateOpenOrders = () => {
+        const todayValue = today();
+        const nextWeek = new Date(todayValue);
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        const nextWeekValue = nextWeek.toISOString().slice(0, 10);
+        let rows = state.orders.filter((order) => !isDelivered(order) && order.status !== 'cancelled');
+        rows = rows.filter((order) => {
+          if (activeFilter === 'paid') return isPaid(order);
+          if (activeFilter === 'unpaid') return !isPaid(order);
+          if (activeFilter === 'soon') return (order.deliveryDate || '') <= nextWeekValue;
+          return true;
+        });
+        if (sortSelect?.value === 'amount') {
+          rows.sort((a, b) => orderTotal(b) - orderTotal(a));
+        } else {
+          rows.sort((a, b) => (a.deliveryDate || '').localeCompare(b.deliveryDate || ''));
+        }
+        document.getElementById('dashboardOpenOrders').innerHTML = dashboardOrderCards(rows, { compact: false });
+      };
+      filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          activeFilter = button.dataset.dashboardFilter;
+          filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+          updateOpenOrders();
+        });
+      });
+      sortSelect?.addEventListener('change', updateOpenOrders);
     }
 
     function bindCustomers() {
