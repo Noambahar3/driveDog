@@ -820,22 +820,30 @@
         min-width: 0;
       }
       .customer-table,
+      .delivery-table,
       .customer-table thead,
+      .delivery-table thead,
       .customer-table tbody,
+      .delivery-table tbody,
       .customer-table tr,
-      .customer-table td {
+      .delivery-table tr,
+      .customer-table td,
+      .delivery-table td {
         display: block;
         width: 100%;
       }
-      .customer-table thead {
+      .customer-table thead,
+      .delivery-table thead {
         display: none;
       }
-      .customer-table tr {
+      .customer-table tr,
+      .delivery-table tr {
         padding: 12px;
         border-bottom: 1px solid var(--line);
         background: #ffffff;
       }
-      .customer-table td {
+      .customer-table td,
+      .delivery-table td {
         display: grid;
         grid-template-columns: minmax(78px, 0.36fr) minmax(0, 1fr);
         gap: 10px;
@@ -843,24 +851,29 @@
         padding: 8px 0;
         border-bottom: 0;
       }
-      .customer-table td::before {
+      .customer-table td::before,
+      .delivery-table td::before {
         content: attr(data-label);
         color: var(--muted);
         font-size: 12px;
         font-weight: 800;
       }
-      .customer-table td:first-child {
+      .customer-table td:first-child,
+      .delivery-table td:first-child {
         display: block;
         padding-top: 0;
       }
-      .customer-table td:first-child::before {
+      .customer-table td:first-child::before,
+      .delivery-table td:first-child::before {
         content: none;
       }
-      .customer-table .row-actions {
+      .customer-table .row-actions,
+      .delivery-table .row-actions {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-      .customer-table .mini {
+      .customer-table .mini,
+      .delivery-table .mini {
         min-height: 44px;
       }
       .dashboard-hero .panel-head,
@@ -1722,23 +1735,25 @@
       return `
         <div class="panel">
           <div class="panel-head"><h2>משלוחים קרובים</h2><input id="deliveryFilter" placeholder="סינון לפי עיר, אזור או לקוח"></div>
-          <div class="list" id="deliveryList">${deliveryCards(rows)}</div>
+          <div id="deliveryList">${deliveriesTable(rows)}</div>
         </div>`;
     }
 
-    function deliveryCards(rows) {
+    function deliveriesTable(rows) {
       if (!rows.length) return '<div class="empty">אין משלוחים להצגה</div>';
-      return rows.map((order) => {
+      return `<div class="table-wrap"><table class="delivery-table"><thead><tr><th>תאריך</th><th>לקוח</th><th>כתובת</th><th>פריטים</th><th>תשלום</th><th>סה"כ</th><th>הערות</th><th>פעולות</th></tr></thead><tbody>${rows.map((order) => {
         const c = customer(order.customerId);
-        const cash = order.paymentStatus === 'cash_on_delivery';
-        return `<article class="delivery-card ${cash ? 'cash' : ''}">
-          <strong>${order.deliveryDate || 'ללא תאריך'} | ${customerName(c)}</strong>
-          <p class="muted">${c?.address || ''}, ${c?.city || ''}</p>
-          <p>${order.items.map((item) => `${productName(product(item.productId))} × ${item.quantity}`).join('<br>')}</p>
-          <p><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span> <strong>${shekel(orderTotal(order))}</strong></p>
-          ${order.notes ? `<p class="muted">${order.notes}</p>` : ''}
-        </article>`;
-      }).join('');
+        return `<tr>
+          <td><strong>${order.deliveryDate || 'ללא תאריך'}</strong><br><span class="muted">${order.id}</span></td>
+          <td data-label="לקוח">${customerName(c)}<br><span class="muted">${c?.phone || ''}</span></td>
+          <td data-label="כתובת">${c?.address || '-'}<br><span class="muted">${c?.city || ''}${c?.area ? ` · ${c.area}` : ''}</span></td>
+          <td data-label="פריטים">${order.items.map((item) => `${productName(product(item.productId))} × ${item.quantity}`).join('<br>')}</td>
+          <td data-label="תשלום"><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span></td>
+          <td data-label="סה&quot;כ"><strong>${shekel(orderTotal(order))}</strong></td>
+          <td data-label="הערות">${order.notes || c?.deliveryNotes || '<span class="muted">אין הערות</span>'}</td>
+          <td data-label="פעולות"><div class="row-actions"><button class="mini" data-pay-link="${order.id}" type="button">קישור תשלום</button><button class="mini" data-mark-paid="${order.id}" type="button">סמן שולם</button><button class="mini" data-delivered="${order.id}" type="button">סופק</button></div></td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
     }
 
     function settingsView() {
@@ -2248,7 +2263,8 @@
           const c = customer(order.customerId);
           return [customerName(c), c?.city, c?.address].join(' ').toLowerCase().includes(q);
         });
-        document.getElementById('deliveryList').innerHTML = deliveryCards(rows);
+        document.getElementById('deliveryList').innerHTML = deliveriesTable(rows);
+        bindOrderActionButtons();
       });
     }
 

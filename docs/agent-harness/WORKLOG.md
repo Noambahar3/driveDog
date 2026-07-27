@@ -3,6 +3,16 @@
 Use this file as a running project memory for decisions, risks, and meaningful
 changes. Keep entries short and factual.
 
+## 2026-07-27
+
+### Regular Public Tunnel Documented
+
+- Noam clarified that the regular Drive Dog tunnel is
+  `https://drive-dog.orma-ai.com/`.
+- Updated the harness README and runbook so future user-facing updates use the
+  regular public tunnel instead of localhost, temporary tunnels, or old ChatGPT
+  preview URLs.
+
 ## 2026-07-22
 
 ### Initial MVP Direction

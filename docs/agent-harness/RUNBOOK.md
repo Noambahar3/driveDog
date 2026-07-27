@@ -71,16 +71,25 @@ Update `WORKLOG.md` when:
 
 ## Public Link Verification
 
+The regular public tunnel for Drive Dog is:
+
+```text
+https://drive-dog.orma-ai.com/
+```
+
+Use this public tunnel in user-facing updates instead of localhost, temporary
+tunnels, or old ChatGPT preview URLs unless Noam explicitly asks for a local
+test URL.
+
 Use:
 
 ```bash
-curl -s -I https://drive-dog-questionnaire.candy-pine-7976.chatgpt.site/proposal
-curl -s https://drive-dog-questionnaire.candy-pine-7976.chatgpt.site/proposal | rg "Drive Dog|דרייב דוג|Orma AI"
+curl -s -I https://drive-dog.orma-ai.com/admin
+curl -s https://drive-dog.orma-ai.com/admin | rg "Drive Dog|דרייב דוג"
 ```
 
 Expected:
 
 - HTTP `200`
-- Hebrew proposal content present
+- Drive Dog admin content present
 - No sensitive credentials in HTML
-

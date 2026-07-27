@@ -12,6 +12,7 @@ checks, and hand work between planning and implementation.
 - Project name: Drive Dog
 - Project ID: `proj-20260722-c0bjt68np0t`
 - Project path: `/home/noam/.openclaw/workspace/drive-dog`
+- Regular public tunnel: `https://drive-dog.orma-ai.com/`
 - Slack channel: `C0BJT68NP0T`
 - Product: CRM and ordering system for a dog/cat food delivery business serving
   recurring private customers.
