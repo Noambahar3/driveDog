@@ -983,11 +983,11 @@
         { id: 'c3', name: 'יוסי מזרחי', phone: '054-3333333', address: 'העצמאות 40', city: 'אשדוד', area: 'דרום', deliveryNotes: 'כלב גדול בחצר', internalNotes: 'מזומן לשליח', active: true }
       ],
       products: [
-        { id: 'p1', brand: 'Brit', series: 'Care', animal: 'כלב', stage: 'בוגר', flavor: 'כבש ואורז', weightKg: 12, name: 'Brit Care כבש ואורז 12 ק"ג', basePrice: 279, active: true },
-        { id: 'p2', brand: 'Monge', series: 'Natural', animal: 'כלב', stage: 'גור', flavor: 'עוף', weightKg: 12, name: 'Monge גור עוף 12 ק"ג', basePrice: 295, active: true },
-        { id: 'p3', brand: 'Acana', series: 'Classic', animal: 'כלב', stage: 'בוגר', flavor: 'עוף', weightKg: 11.4, name: 'Acana Classic עוף 11.4 ק"ג', basePrice: 349, active: true },
-        { id: 'p4', brand: 'Royal Canin', series: 'Indoor', animal: 'חתול', stage: 'בוגר', flavor: 'עוף', weightKg: 4, name: 'Royal Canin Indoor חתול 4 ק"ג', basePrice: 189, active: true },
-        { id: 'p5', brand: 'Josera', series: 'SensiCat', animal: 'חתול', stage: 'בוגר', flavor: 'עוף', weightKg: 10, name: 'Josera SensiCat 10 ק"ג', basePrice: 265, active: true }
+        { id: 'p1', stage: 'בוגר', flavor: 'כבש', weightKg: 12, name: 'Brit Care כבש ואורז 12 ק"ג', basePrice: 279, notes: 'שק קבוע ללקוחות שמעדיפים כבש ואורז', active: true },
+        { id: 'p2', stage: 'גור', flavor: 'עוף', weightKg: 12, name: 'Monge גור עוף 12 ק"ג', basePrice: 295, notes: '', active: true },
+        { id: 'p3', stage: 'בוגר', flavor: 'עוף', weightKg: 11.4, name: 'Acana Classic עוף 11.4 ק"ג', basePrice: 349, notes: '', active: true },
+        { id: 'p4', stage: 'מבוגר', flavor: 'עוף', weightKg: 4, name: 'Royal Canin Senior 4 ק"ג', basePrice: 189, notes: 'שק קטן ללקוחות עם כלבים מבוגרים', active: true },
+        { id: 'p5', stage: 'מזון רגיש', flavor: 'דגים', weightKg: 10, name: 'Josera Sensitive דגים 10 ק"ג', basePrice: 265, notes: 'מתאים ללקוחות שמבקשים מזון עדין יותר', active: true }
       ],
       prices: [
         { id: 'cp1', customerId: 'c1', productId: 'p1', customPrice: 259, discountPercent: 0, notes: 'מחיר קבוע' },
@@ -1124,6 +1124,10 @@
 
     function product(id) {
       return state.products.find((item) => item.id === id);
+    }
+
+    function productName(item) {
+      return item?.name || item?.bagName || '-';
     }
 
     function orderTotal(order) {
@@ -1430,7 +1434,7 @@
               </div>
               <span class="status ${statusClass(status)}">${statusLabel(status)}</span>
             </div>
-            ${options.compact ? '' : `<div class="muted">${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</div>`}
+            ${options.compact ? '' : `<div class="muted">${order.items.map((item) => `${productName(product(item.productId))} × ${item.quantity}`).join('<br>')}</div>`}
             <div class="order-card-foot">
               <span>${order.notes || order.id}</span>
               <strong class="amount-strong">${shekel(orderTotal(order))}</strong>
@@ -1595,7 +1599,7 @@
     function customerPricesSummary(rows) {
       if (!rows.length) return '<div class="empty">אין מחירים אישיים ללקוח הזה</div>';
       return `<div class="table-wrap"><table><thead><tr><th>מוצר</th><th>מחיר אישי</th><th>הנחה</th><th>מחיר להזמנה</th></tr></thead><tbody>${rows.map((price) => `
-        <tr><td>${product(price.productId)?.name || '-'}</td><td>${Number(price.customPrice || 0) > 0 ? shekel(price.customPrice) : '-'}</td><td>${price.discountPercent || 0}%</td><td><strong>${shekel(priceFor(price.customerId, price.productId))}</strong></td></tr>`).join('')}</tbody></table></div>`;
+        <tr><td>${productName(product(price.productId))}</td><td>${Number(price.customPrice || 0) > 0 ? shekel(price.customPrice) : '-'}</td><td>${price.discountPercent || 0}%</td><td><strong>${shekel(priceFor(price.customerId, price.productId))}</strong></td></tr>`).join('')}</tbody></table></div>`;
     }
 
     function productsView() {
@@ -1603,31 +1607,39 @@
         <div class="split">
           <div class="panel">
             <div class="panel-head"><h2>מוצרים</h2></div>
-            <div class="table-wrap">${productsTable()}</div>
+            <div class="filters">
+              <input id="productSearch" placeholder="חיפוש לפי שם שק, טעם או הערות">
+              ${selectField('סוג מזון / גיל', 'productStageFilter', ['', 'בוגר', 'גור', 'מבוגר', 'מזון רגיש', 'מזון רפואי'])}
+              ${selectField('בסיס בשר / טעם', 'productFlavorFilter', ['', 'עוף', 'דגים', 'כבש', 'בשר', 'אחר'])}
+              <button class="button ghost" id="clearProductFilters" type="button">ניקוי</button>
+            </div>
+            <div class="table-wrap" id="productsTable">${productsTable(state.products)}</div>
           </div>
           <form class="panel form-grid" id="productForm">
             <div class="field full"><h2>מוצר חדש / עריכה</h2></div>
             ${hiddenId('productId')}
-            ${field('מותג', 'productBrand')}
-            ${field('סדרה', 'productSeries')}
-            ${field('חיה', 'productAnimal')}
-            ${field('שלב חיים', 'productStage')}
-            ${field('טעם', 'productFlavor')}
+            <div class="field full">${fieldInput('שם השק', 'productName')}</div>
             ${field('משקל ק"ג', 'productWeight', 'number')}
-            ${field('שם תצוגה', 'productName')}
+            <div class="field"><label>לאיזה גיל / סוג מזון</label>${optionSelect('productStage', ['בוגר', 'גור', 'מבוגר', 'מזון רגיש', 'מזון רפואי'])}</div>
+            <div class="field"><label>בסיס בשר / טעם</label>${optionSelect('productFlavor', ['עוף', 'דגים', 'כבש', 'בשר', 'אחר'])}</div>
             ${field('מחיר בסיס', 'productPrice', 'number')}
             <div class="field"><label>פעיל</label><select id="productActive"><option value="true">כן</option><option value="false">לא</option></select></div>
+            ${area('הערות', 'productNotes')}
             <div class="field full toolbar"><button class="button primary" type="submit">שמירה</button><button class="button ghost" id="clearProduct" type="button">ניקוי</button></div>
           </form>
         </div>`;
     }
 
-    function productsTable() {
-      return `<table><thead><tr><th>מוצר</th><th>מאפיינים</th><th>מחיר בסיס</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>${state.products.map((item) => `
+    function productsTable(rows) {
+      if (!rows.length) return '<div class="empty">אין מוצרים להצגה</div>';
+      return `<table><thead><tr><th>שם השק</th><th>משקל</th><th>גיל / סוג מזון</th><th>בסיס בשר / טעם</th><th>מחיר בסיס</th><th>הערות</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>${rows.map((item) => `
         <tr>
-          <td><strong>${item.name}</strong><br><span class="muted">${item.brand} ${item.series}</span></td>
-          <td>${item.animal} / ${item.stage}<br><span class="muted">${item.flavor}, ${item.weightKg} ק"ג</span></td>
+          <td><strong>${productName(item)}</strong></td>
+          <td>${item.weightKg ? `${item.weightKg} ק"ג` : '-'}</td>
+          <td>${item.stage || '-'}</td>
+          <td>${item.flavor || '-'}</td>
           <td>${shekel(item.basePrice)}</td>
+          <td class="break-word">${item.notes || '-'}</td>
           <td><span class="status ${item.active ? 'ok' : 'danger'}">${item.active ? 'פעיל' : 'לא פעיל'}</span></td>
           <td><button class="mini" data-edit-product="${item.id}" type="button">עריכה</button></td>
         </tr>`).join('')}</tbody></table>`;
@@ -1641,7 +1653,7 @@
             <div class="table-wrap"><table><thead><tr><th>לקוח</th><th>מוצר</th><th>מחיר אישי</th><th>הנחה</th><th>מחיר להזמנה</th><th>פעולות</th></tr></thead><tbody>${state.prices.map((item) => `
               <tr>
                 <td>${customerName(customer(item.customerId))}</td>
-                <td>${product(item.productId)?.name || '-'}</td>
+                <td>${productName(product(item.productId))}</td>
                 <td>${Number(item.customPrice || 0) > 0 ? shekel(item.customPrice) : '-'}</td>
                 <td>${item.discountPercent || 0}%</td>
                 <td><strong>${shekel(priceFor(item.customerId, item.productId))}</strong></td>
@@ -1697,7 +1709,7 @@
           <td><strong>${order.id}</strong><br><span class="muted">${order.createdAt}</span></td>
           <td>${customerName(c)}<br><span class="muted">${c ? `${c.city || ''}` : ''}</span></td>
           <td>${order.deliveryDate || '-'}<br><span class="status ${statusClass(order.status)}">${statusLabel(order.status)}</span></td>
-          <td>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</td>
+          <td>${order.items.map((item) => `${productName(product(item.productId))} × ${item.quantity}`).join('<br>')}</td>
           <td><strong>${shekel(orderTotal(order))}</strong></td>
           <td><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span></td>
           <td><div class="row-actions"><button class="mini" data-pay-link="${order.id}" type="button">קישור תשלום</button><button class="mini" data-mark-paid="${order.id}" type="button">סמן שולם</button><button class="mini" data-delivered="${order.id}" type="button">סופק</button></div></td>
@@ -1722,7 +1734,7 @@
         return `<article class="delivery-card ${cash ? 'cash' : ''}">
           <strong>${order.deliveryDate || 'ללא תאריך'} | ${customerName(c)}</strong>
           <p class="muted">${c?.address || ''}, ${c?.city || ''}</p>
-          <p>${order.items.map((item) => `${product(item.productId)?.name || '-'} × ${item.quantity}`).join('<br>')}</p>
+          <p>${order.items.map((item) => `${productName(product(item.productId))} × ${item.quantity}`).join('<br>')}</p>
           <p><span class="status ${statusClass(order.paymentStatus)}">${statusLabel(order.paymentStatus)}</span> <strong>${shekel(orderTotal(order))}</strong></p>
           ${order.notes ? `<p class="muted">${order.notes}</p>` : ''}
         </article>`;
@@ -1748,8 +1760,20 @@
       return `<div class="field"><label>${labelText}</label><input id="${id}" type="${type}"></div>`;
     }
 
+    function fieldInput(labelText, id, type = 'text') {
+      return `<label>${labelText}</label><input id="${id}" type="${type}">`;
+    }
+
     function area(labelText, id) {
       return `<div class="field full"><label>${labelText}</label><textarea id="${id}"></textarea></div>`;
+    }
+
+    function optionSelect(id, options) {
+      return `<select id="${id}">${options.map((option) => `<option value="${option}">${option}</option>`).join('')}</select>`;
+    }
+
+    function selectField(labelText, id, options) {
+      return `<select id="${id}" aria-label="${labelText}">${options.map((option) => `<option value="${option}">${option || labelText}</option>`).join('')}</select>`;
     }
 
     function escapeHtml(value) {
@@ -1771,7 +1795,7 @@
     }
 
     function productSelect(id) {
-      return `<select id="${id}">${state.products.filter((item) => item.active).map((item) => `<option value="${item.id}">${item.name} | ${shekel(item.basePrice)}</option>`).join('')}</select>`;
+      return `<select id="${id}">${state.products.filter((item) => item.active).map((item) => `<option value="${item.id}">${productName(item)} | ${shekel(item.basePrice)}</option>`).join('')}</select>`;
     }
 
     function bindView() {
@@ -2024,24 +2048,46 @@
     function bindProducts() {
       const form = document.getElementById('productForm');
       if (!form) return;
-      document.querySelectorAll('[data-edit-product]').forEach((button) => button.addEventListener('click', () => fillProduct(button.dataset.editProduct)));
-      document.getElementById('clearProduct').addEventListener('click', () => form.reset());
+      const bindProductRows = () => {
+        document.querySelectorAll('[data-edit-product]').forEach((button) => button.addEventListener('click', () => fillProduct(button.dataset.editProduct)));
+      };
+      const filterProducts = () => {
+        const q = value('productSearch').toLowerCase();
+        const stage = value('productStageFilter');
+        const flavor = value('productFlavorFilter');
+        const rows = state.products.filter((item) => {
+          const text = [productName(item), item.stage, item.flavor, item.notes, item.weightKg].join(' ').toLowerCase();
+          return (!q || text.includes(q)) && (!stage || item.stage === stage) && (!flavor || item.flavor === flavor);
+        });
+        document.getElementById('productsTable').innerHTML = productsTable(rows);
+        bindProductRows();
+      };
+      bindProductRows();
+      ['productSearch', 'productStageFilter', 'productFlavorFilter'].forEach((id) => document.getElementById(id).addEventListener('input', filterProducts));
+      document.getElementById('clearProductFilters').addEventListener('click', () => {
+        setValue('productSearch', '');
+        setValue('productStageFilter', '');
+        setValue('productFlavorFilter', '');
+        filterProducts();
+      });
+      document.getElementById('clearProduct').addEventListener('click', () => {
+        form.reset();
+        setValue('productId', '');
+      });
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         const id = value('productId') || nextId('p', state.products);
         const item = {
           id,
-          brand: value('productBrand'),
-          series: value('productSeries'),
-          animal: value('productAnimal'),
           stage: value('productStage'),
           flavor: value('productFlavor'),
           weightKg: Number(value('productWeight') || 0),
           name: value('productName'),
           basePrice: Number(value('productPrice') || 0),
+          notes: value('productNotes'),
           active: value('productActive') === 'true'
         };
-        if (!item.name || !item.basePrice) return toast('צריך שם מוצר ומחיר בסיס');
+        if (!item.name || !item.weightKg || !item.basePrice) return toast('צריך שם שק, משקל ומחיר בסיס');
         upsert(state.products, item);
         saveState('מוצר נשמר');
       });
@@ -2051,14 +2097,12 @@
       const item = product(id);
       if (!item) return;
       setValue('productId', item.id);
-      setValue('productBrand', item.brand);
-      setValue('productSeries', item.series);
-      setValue('productAnimal', item.animal);
       setValue('productStage', item.stage);
       setValue('productFlavor', item.flavor);
       setValue('productWeight', item.weightKg);
-      setValue('productName', item.name);
+      setValue('productName', productName(item));
       setValue('productPrice', item.basePrice);
+      setValue('productNotes', item.notes);
       setValue('productActive', String(item.active));
     }
 
