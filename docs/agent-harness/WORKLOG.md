@@ -155,3 +155,15 @@ changes. Keep entries short and factual.
   future source and no live provider call was added.
 - Verified with `npm run build`, `npm test`, and a local API smoke check for
   create, reset password, delete, and deleted-customer archive.
+
+## 2026-07-27
+
+### Products Screen Deployed
+
+- Deployed the products-screen changes to `https://drive-dog.orma-ai.com/admin`.
+- Commit `1747051` refines the product catalog fields to focus on bag name,
+  weight, food age/type, meat/flavor base, base price, notes, active status, and
+  product filters.
+- Ran `npm test`, `npm run build`, `node --check dist/server/index.js`, pushed
+  `main` to GitHub and the Sites source repo, saved Sites version 24, and
+  deployed it successfully.
